@@ -24,16 +24,42 @@ Module de provisioning ClientXCMS pour **Calagopus**, panel de gestion de serveu
 | ClientXCMS | Instance avec le système de modules v2 |
 | Panel Calagopus | Version `1.1.x`, vérifié sur `1.1.4` |
 | Accès réseau | Depuis ClientXCMS vers le panel, en HTTPS |
+| Pour l'authentification unique seulement | Un panel en image `heavy`, seule variante capable d'accueillir des extensions. Décidez-le avant la mise en production : changer d'image ensuite se fait, mais pas en un clic |
+
+Les commandes `php artisan` de ce document se lancent à la racine de votre instance ClientXCMS, avec l'utilisateur qui fait tourner l'application. Si elle tourne en conteneur, préfixez-les de la manière habituelle chez vous, par exemple `docker exec <conteneur> php artisan …`.
 
 ## Installation
 
-1. Placer le dossier `calagopus` dans `modules/` de votre instance ClientXCMS.
-2. Activer le module depuis l'administration, section Extensions.
-3. Ajouter le panel dans Provisioning, puis lancer le test de connexion.
+1. Récupérer le module dans le dossier `modules/` de votre instance :
+
+   ```sh
+   git clone https://github.com/Cerbonix/module-calagopus.git /tmp/module-calagopus
+   cp -r /tmp/module-calagopus/modules/calagopus modules/calagopus
+   ```
+
+2. L'activer dans **Paramètres > Extensions** (`/admin/settings/extensions`).
+3. Créer la clé API sur le panel, comme décrit à la section suivante.
+4. Déclarer le panel dans **Paramètres > Approvisionnement > Serveurs**, bouton « Créer un serveur » (`/admin/servers/create`), en choisissant le type `Calagopus`.
+
+Les libellés de ce formulaire sont ceux du noyau ClientXCMS, communs à tous les panels. Deux d'entre eux ne veulent pas dire ce qu'ils annoncent ici :
+
+| Champ affiché | Ce que le module y attend |
+|---|---|
+| Nom | Le nom du panel dans votre administration, libre |
+| Type de serveur | `Calagopus` |
+| Nom d'hôte | L'adresse d'API du panel, par exemple `panel.example.net` |
+| Adresse IP | Facultatif, informatif |
+| Port | `443` en HTTPS |
+| **Nom d'utilisateur** | **Le secret partagé de l'authentification unique**, à laisser vide pour l'instant. La commande `php artisan calagopus:sso` l'écrira |
+| **Mot de passe** | **La clé API du panel**, 48 caractères |
+
+5. Lancer **Tester la connexion** sur la fiche du serveur. Il vérifie la version du panel, chaque permission de lecture de la clé, et l'état de l'authentification unique.
 
 ## Créer la clé API
 
 Le module s'authentifie avec une clé API de panel, en-tête `Authorization: Bearer`. Créez un **compte de service dédié**, pas un compte humain, et une clé qui ne sert qu'à ClientXCMS.
+
+Sur le panel, connectez-vous avec ce compte de service et ouvrez **`/account/api-keys`**, puis créez la clé. Elle n'est affichée qu'une fois : recopiez-la immédiatement dans le champ « Mot de passe » du serveur ClientXCMS.
 
 Le compte porteur ne doit **pas** être administrateur du panel. L'autorisation effective est l'intersection des permissions du compte et des portées de la clé : un compte administrateur annule le bénéfice d'une clé restreinte.
 
@@ -47,8 +73,8 @@ Permissions à accorder, dans la portée **`admin_permissions`** de la clé :
 | `servers.read` | Lire l'état du serveur |
 | `servers.update` | Suspendre, réactiver, changer les limites ou le propriétaire |
 | `servers.delete` | Résilier |
-| `eggs.read` | Lister les eggs pour la configuration des produits |
-| `locations.read` | Alimenter le placement automatique |
+| `eggs.read` | Lister les *eggs* pour la configuration des produits. Un egg est le modèle d'un jeu sur le panel : image de conteneur, commande de démarrage, variables. « Minecraft Vanilla » et « Rust » sont deux eggs |
+| `locations.read` | Lister les emplacements, groupes de nœuds parmi lesquels le panel choisit où poser le serveur |
 | `stats.read` | Lire la version du panel, vérifiée à la connexion |
 
 Ajoutez `backups.read` et `backups.delete` si vous utilisez la conservation des sauvegardes.
@@ -86,6 +112,8 @@ Le module ne recopie pas l'adresse publique : il la **demande au panel**, qui es
 Le même partage existe côté nœud : renseignez son `public_url` si son `url` n'est pas joignable depuis un navigateur, sans quoi la console du client restera déconnectée.
 
 ## Configurer un produit
+
+Dans **Paramètres de la boutique > Produits** (`/admin/products`), ouvrez le produit, choisissez le type de produit `Calagopus`, puis renseignez sa configuration : l'egg à déployer, le ou les emplacements autorisés, l'image de conteneur, la commande de démarrage, les ressources et la plage de ports. Les listes d'eggs et d'emplacements sont chargées depuis votre panel, donc un produit ne peut se configurer qu'une fois le serveur déclaré et le test de connexion passé.
 
 ### Les unités ne sont pas celles de Pterodactyl
 
@@ -127,7 +155,7 @@ Sans elle, le client qui clique sur « Ouvrir le panel » arrive sur la page de 
 
 | | |
 |---|---|
-| Côté panel | L'extension [`Cerbonix/calagopus-sso`](https://github.com/Cerbonix/calagopus-sso) installée, ce qui suppose une image `heavy` |
+| Côté panel | L'extension [`Cerbonix/calagopus-sso`](https://github.com/Cerbonix/calagopus-sso) installée, ce qui suppose un panel en image `heavy`. Sa propre documentation couvre la construction et l'installation |
 | Côté clé API | La permission `ssotickets.manage` en plus des autres |
 | Des deux côtés | Un même secret partagé |
 
@@ -213,16 +241,44 @@ ClientXCMS provisioning module for **Calagopus**, a game server management panel
 | ClientXCMS | Instance with the v2 module system |
 | Calagopus panel | Version `1.1.x`, verified against `1.1.4` |
 | Network access | From ClientXCMS to the panel, over HTTPS |
+| For single sign-on only | A panel running the `heavy` image, the only variant able to host extensions. Decide before going live: switching later is possible, but not in one click |
+
+The `php artisan` commands in this document run at the root of your ClientXCMS instance, as the user running the application. If it runs in a container, prefix them the way you usually do, for instance `docker exec <container> php artisan …`.
 
 ## Installation
 
-1. Put the `calagopus` folder into `modules/` on your ClientXCMS instance.
-2. Enable the module from the admin area, Extensions section.
-3. Add the panel under Provisioning, then run the connection test.
+1. Get the module into the `modules/` folder of your instance:
+
+   ```sh
+   git clone https://github.com/Cerbonix/module-calagopus.git /tmp/module-calagopus
+   cp -r /tmp/module-calagopus/modules/calagopus modules/calagopus
+   ```
+
+2. Enable it under **Paramètres > Extensions** (`/admin/settings/extensions`).
+3. Create the API key on the panel, as described in the next section.
+4. Declare the panel under **Paramètres > Approvisionnement > Serveurs**, "Créer un serveur" button (`/admin/servers/create`), picking the `Calagopus` type.
+
+   The ClientXCMS admin area currently ships French labels only, whatever your locale, hence the French menu names above. The URLs are the reliable anchor.
+
+The labels on that form come from the ClientXCMS core and are shared by every panel. Two of them do not mean what they say here:
+
+| Displayed field | What the module expects |
+|---|---|
+| Nom | The panel name in your admin area, free text |
+| Type de serveur | `Calagopus` |
+| Nom d'hôte | The panel API address, for instance `panel.example.net` |
+| Adresse IP | Optional, informational |
+| Port | `443` over HTTPS |
+| **Nom d'utilisateur** | **The single sign-on shared secret**, leave it empty for now. `php artisan calagopus:sso` will write it |
+| **Mot de passe** | **The panel API key**, 48 characters |
+
+5. Run **Test connection** on the server page. It checks the panel version, every read permission on the key, and the single sign-on state.
 
 ## Creating the API key
 
 The module authenticates with a panel API key, using the `Authorization: Bearer` header. Create a **dedicated service account**, not a human one, and a key used only by ClientXCMS.
+
+On the panel, sign in as that service account, open **`/account/api-keys`**, then create the key. It is shown only once: copy it straight into the "Password" field of the ClientXCMS server.
 
 The owning account must **not** be a panel administrator. Effective authorization is the intersection of the account permissions and the key scopes: an administrator account cancels the benefit of a restricted key.
 
@@ -236,8 +292,8 @@ Permissions to grant, in the key's **`admin_permissions`** scope:
 | `servers.read` | Read server state |
 | `servers.update` | Suspend, unsuspend, change limits or owner |
 | `servers.delete` | Terminate |
-| `eggs.read` | List eggs for product configuration |
-| `locations.read` | Feed automatic placement |
+| `eggs.read` | List the *eggs* used when configuring products. An egg is a game template on the panel: container image, startup command, variables. "Minecraft Vanilla" and "Rust" are two eggs |
+| `locations.read` | List locations, the node groups the panel picks from when placing the server |
 | `stats.read` | Read the panel version, checked on connection test |
 
 Add `backups.read` and `backups.delete` if you use backup retention.
@@ -275,6 +331,8 @@ The module does not copy the public address: it **asks the panel**, which alone 
 The same split exists on the node: set its `public_url` when its `url` is not reachable from a browser, otherwise the customer console stays disconnected.
 
 ## Configuring a product
+
+Under **Paramètres de la boutique > Produits** (`/admin/products`), open the product, pick the `Calagopus` product type, then fill in its configuration: the egg to deploy, the allowed locations, the container image, the startup command, the resources and the port range. The egg and location lists are loaded from your panel, so a product can only be configured once the server is declared and the connection test passes.
 
 ### Units are not Pterodactyl's
 
@@ -316,7 +374,7 @@ Without it, a customer clicking "Open the panel" lands on the panel login page a
 
 | | |
 |---|---|
-| On the panel | The [`Cerbonix/calagopus-sso`](https://github.com/Cerbonix/calagopus-sso) extension installed, which implies a `heavy` image |
+| On the panel | The [`Cerbonix/calagopus-sso`](https://github.com/Cerbonix/calagopus-sso) extension installed, which implies a panel running the `heavy` image. Its own documentation covers building and installing it |
 | On the API key | The `ssotickets.manage` permission, on top of the others |
 | On both sides | One shared secret |
 
