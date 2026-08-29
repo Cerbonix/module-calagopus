@@ -17,8 +17,10 @@ return [
         'rate_limited' => 'Too many requests sent to the panel. Try again shortly.',
         'unexpected' => 'Unexpected response from the panel. Detail: :detail',
         'sso_ready' => 'Single sign-on is configured.',
-        'sso_absent' => 'Single sign-on is not configured: put the shared secret in the Username field so your customers reach the panel without signing in again.',
+        'sso_absent' => 'Single sign-on is not configured: run `php artisan calagopus:sso`, which lines ClientXCMS and the panel up in one go, so your customers reach the panel without signing in again.',
         'sso_unreachable' => 'Single sign-on is configured but the panel extension does not answer.',
+        'sso_mismatch' => 'The shared secret does not match the panel one: your customers will land on the login page. Run `php artisan calagopus:sso` to line both sides up.',
+        'sso_no_extension' => 'The single sign-on extension is not installed on the panel: your customers will have to sign in themselves.',
     ],
 
     'lifecycle' => [

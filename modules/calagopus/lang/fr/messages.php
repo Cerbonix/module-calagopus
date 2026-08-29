@@ -17,8 +17,10 @@ return [
         'rate_limited' => 'Trop de requêtes envoyées au panel. Réessayez dans quelques instants.',
         'unexpected' => 'Réponse inattendue du panel. Détail : :detail',
         'sso_ready' => 'L\'authentification unique est configurée.',
-        'sso_absent' => 'L\'authentification unique n\'est pas configurée : renseignez le secret partagé dans le champ Nom d\'utilisateur pour que vos clients accèdent au panel sans se reconnecter.',
+        'sso_absent' => 'L\'authentification unique n\'est pas configurée : lancez `php artisan calagopus:sso`, qui accorde ClientXCMS et le panel en une fois, pour que vos clients accèdent au panel sans se reconnecter.',
         'sso_unreachable' => 'L\'authentification unique est configurée mais l\'extension du panel ne répond pas.',
+        'sso_mismatch' => 'Le secret partagé ne correspond pas à celui du panel : vos clients arriveront sur la page de connexion. Lancez `php artisan calagopus:sso` pour accorder les deux côtés.',
+        'sso_no_extension' => 'L\'extension d\'authentification unique n\'est pas installée sur le panel : vos clients devront se connecter eux-mêmes.',
     ],
 
     'lifecycle' => [

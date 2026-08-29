@@ -153,6 +153,46 @@ class CalagopusConnectionTest extends TestCase
         $this->assertStringContainsString(__('calagopus::messages.connection.sso_ready'), $result->toString());
     }
 
+    public function test_it_refuses_to_call_single_sign_on_ready_when_the_panel_rejects_the_secret(): void
+    {
+        Http::fake([
+            '*/system/overview' => Http::response(['version' => '1.1.4']),
+            '*/auth/ssotickets' => Http::response(['errors' => ['invalid credentials']], 401),
+            '*' => Http::response(['data' => []]),
+        ]);
+
+        $result = (new CalagopusServerType)->testConnection($this->params(['username' => str_repeat('s', 48)]));
+
+        $this->assertStringContainsString(__('calagopus::messages.connection.sso_mismatch'), $result->toString());
+        $this->assertStringNotContainsString(__('calagopus::messages.connection.sso_ready'), $result->toString());
+    }
+
+    public function test_it_says_when_the_panel_carries_no_single_sign_on_extension(): void
+    {
+        Http::fake([
+            '*/system/overview' => Http::response(['version' => '1.1.4']),
+            '*/auth/ssotickets' => Http::response([], 404),
+            '*' => Http::response(['data' => []]),
+        ]);
+
+        $result = (new CalagopusServerType)->testConnection($this->params(['username' => str_repeat('s', 48)]));
+
+        $this->assertStringContainsString(__('calagopus::messages.connection.sso_no_extension'), $result->toString());
+    }
+
+    public function test_it_sends_the_real_secret_when_it_checks_single_sign_on(): void
+    {
+        Http::fake([
+            '*/system/overview' => Http::response(['version' => '1.1.4']),
+            '*' => Http::response(['data' => []]),
+        ]);
+
+        (new CalagopusServerType)->testConnection($this->params(['username' => str_repeat('s', 48)]));
+
+        Http::assertSent(fn ($request) => ! str_contains($request->url(), 'auth/ssotickets')
+            || $request->data()['secret'] === str_repeat('s', 48));
+    }
+
     public function test_it_names_every_permission_the_key_is_missing(): void
     {
         Http::fake([

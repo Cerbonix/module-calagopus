@@ -344,13 +344,25 @@ class CalagopusServerType extends AbstractServerType
      */
     private function ssoState(Server $server): string
     {
-        if (trim((string) $server->username) === '') {
+        $secret = trim((string) $server->username);
+
+        if ($secret === '') {
             return $this->trans('sso_absent');
         }
 
-        return Http::callPanel($server, 'auth/ssotickets', ['secret' => '', 'user_uuid' => '00000000-0000-0000-0000-000000000000'])->status() === 0
-            ? $this->trans('sso_unreachable')
-            : $this->trans('sso_ready');
+        // Asking for a ticket with the real secret is the only proof the two sides agree. The nil user makes it unusable, and it expires on its own.
+        $response = Http::callPanel($server, 'auth/ssotickets', [
+            'secret' => $secret,
+            'user_uuid' => '00000000-0000-0000-0000-000000000000',
+        ]);
+
+        return match (true) {
+            $response->status() === 0 => $this->trans('sso_unreachable'),
+            $response->status() === 404 => $this->trans('sso_no_extension'),
+            $response->status() === 401 || $response->status() === 403 => $this->trans('sso_mismatch'),
+            $response->successful() => $this->trans('sso_ready'),
+            default => $this->trans('sso_unreachable'),
+        };
     }
 
     private function successMessage(string $version): string
