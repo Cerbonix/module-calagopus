@@ -8,12 +8,13 @@
 
 use App\Models\Account\Customer;
 use App\Models\Provisioning\Service;
-use App\Modules\Calagopus\KeptBackupsNotice;
+use App\Modules\Calagopus\InactiveServicePanel;
 use App\Modules\Calagopus\Models\CalagopusBackupPurge;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
-class CalagopusKeptBackupsNoticeTest extends TestCase
+class CalagopusInactiveServicePanelTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -41,8 +42,19 @@ class CalagopusKeptBackupsNoticeTest extends TestCase
         }
     }
 
+    public function test_a_cancelled_service_keeps_access_to_a_server_that_still_runs(): void
+    {
+        $this->fakePanel(serverExists: true);
+        $service = $this->service(Service::STATUS_CANCELLED);
+
+        $html = $this->composed($service);
+
+        $this->assertStringContainsString(route('calagopus.sso', ['service' => $service]), $html);
+    }
+
     public function test_a_terminated_service_gets_a_way_back_to_its_backups(): void
     {
+        $this->fakePanel(serverExists: false);
         $service = $this->service(Service::STATUS_EXPIRED);
         $this->keptBackup($service);
 
@@ -53,6 +65,7 @@ class CalagopusKeptBackupsNoticeTest extends TestCase
 
     public function test_it_keeps_whatever_the_core_already_rendered(): void
     {
+        $this->fakePanel(serverExists: false);
         $service = $this->service(Service::STATUS_CANCELLED);
         $this->keptBackup($service);
 
@@ -63,6 +76,7 @@ class CalagopusKeptBackupsNoticeTest extends TestCase
 
     public function test_an_active_service_is_left_alone(): void
     {
+        $this->fakePanel(serverExists: true);
         $service = $this->service(Service::STATUS_ACTIVE);
         $this->keptBackup($service);
 
@@ -71,6 +85,7 @@ class CalagopusKeptBackupsNoticeTest extends TestCase
 
     public function test_a_terminated_service_without_kept_backups_shows_nothing(): void
     {
+        $this->fakePanel(serverExists: false);
         $service = $this->service(Service::STATUS_EXPIRED);
 
         $this->assertSame('', $this->composed($service));
@@ -78,10 +93,29 @@ class CalagopusKeptBackupsNoticeTest extends TestCase
 
     public function test_another_product_type_is_left_alone(): void
     {
+        $this->fakePanel(serverExists: false);
         $service = $this->service(Service::STATUS_EXPIRED, 'pterodactyl');
         $this->keptBackup($service);
 
         $this->assertSame('', $this->composed($service));
+    }
+
+    private function fakePanel(bool $serverExists): void
+    {
+        Http::fake([
+            '*/servers/external/*' => $serverExists
+                ? Http::response(['server' => [
+                    'uuid' => '11111111-2222-3333-4444-555555555555',
+                    'uuid_short' => 'abcdef12',
+                    'name' => 'srv',
+                    'is_suspended' => false,
+                    'external_id' => '1',
+                    'limits' => ['cpu' => 100, 'memory' => 1024, 'disk' => 5120],
+                    'allocation' => null,
+                ]])
+                : Http::response(['errors' => ['not found']], 404),
+            '*' => Http::response(['app' => ['url' => 'https://panel.test']]),
+        ]);
     }
 
     private function composed(Service $service, string $existing = ''): string
@@ -90,7 +124,7 @@ class CalagopusKeptBackupsNoticeTest extends TestCase
             ->with('service', $service)
             ->with('panel_html', $existing);
 
-        KeptBackupsNotice::compose($view);
+        InactiveServicePanel::compose($view);
 
         return (string) ($view->getData()['panel_html'] ?? '');
     }

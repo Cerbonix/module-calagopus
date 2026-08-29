@@ -36,7 +36,7 @@ class CalagopusServiceProvider extends \App\Extensions\BaseModuleServiceProvider
         \Route::middleware('web')->group(module_path('calagopus', 'routes/web.php'));
 
         // The core blanks the panel as soon as a service leaves the active state, so kept backups would have no way back.
-        \View::composer('front/provisioning/services/show', [KeptBackupsNotice::class, 'compose']);
+        \View::composer('front/provisioning/services/show', [InactiveServicePanel::class, 'compose']);
 
         if ($this->app->runningInConsole()) {
             $this->commands([PurgeExpiredBackups::class, ConfigureSso::class]);
