@@ -99,6 +99,28 @@ class CalagopusLifecycleTest extends TestCase
         Http::assertSent(fn ($request) => $request->method() === 'PATCH' && $request->data() === ['suspended' => true]);
     }
 
+    public function test_it_always_asks_the_panel_for_a_port_because_none_is_assigned_otherwise(): void
+    {
+        Http::fake([
+            '*/servers/external/*' => Http::response(['errors' => ['server not found']], 404),
+            '*/users/external/*' => Http::response(['user' => ['uuid' => '77777777-8888-9999-aaaa-bbbbbbbbbbbb', 'email' => 'a@b.c', 'username' => 'ab']]),
+            '*/servers/deploy' => Http::response(['server' => $this->panelServer()]),
+        ]);
+
+        (new CalagopusServerType)->createAccount($this->service());
+
+        Http::assertSent(function ($request) {
+            if (! str_contains($request->url(), 'servers/deploy')) {
+                return false;
+            }
+            $allocations = $request->data()['deployment']['allocations'] ?? null;
+
+            return $allocations !== null
+                && $allocations['primary']['start_port'] === 25565
+                && $allocations['primary']['end_port'] === 25595;
+        });
+    }
+
     public function test_it_reports_a_missing_server_instead_of_pretending_it_suspended_one(): void
     {
         Http::fake(['*' => Http::response(['errors' => ['server not found']], 404)]);

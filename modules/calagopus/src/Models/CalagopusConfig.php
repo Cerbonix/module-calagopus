@@ -21,6 +21,9 @@ class CalagopusConfig extends Model
         'server_id',
         'egg_uuid',
         'location_uuids',
+        'port_start',
+        'port_end',
+        'dedicated_ip',
         'cpu',
         'memory',
         'memory_overhead',
@@ -43,9 +46,13 @@ class CalagopusConfig extends Model
         'location_uuids' => 'array',
         'start_on_completion' => 'boolean',
         'skip_installer' => 'boolean',
+        'dedicated_ip' => 'boolean',
     ];
 
     protected $attributes = [
+        'port_start' => 25565,
+        'port_end' => 25595,
+        'dedicated_ip' => false,
         'cpu' => 100,
         'memory' => 1024,
         'memory_overhead' => 0,
@@ -78,6 +85,22 @@ class CalagopusConfig extends Model
             'swap' => (int) $this->swap,
             'disk' => (int) $this->disk,
             'io_weight' => $this->io_weight === null ? null : (int) $this->io_weight,
+        ];
+    }
+
+    /**
+     * Left null the panel assigns no allocation at all, so the range is always sent.
+     */
+    public function allocationDeployment(): array
+    {
+        return [
+            'dedicated' => (bool) $this->dedicated_ip,
+            'primary' => [
+                'start_port' => (int) $this->port_start,
+                'end_port' => (int) $this->port_end,
+                'assign_to_variable' => null,
+            ],
+            'additional' => [],
         ];
     }
 

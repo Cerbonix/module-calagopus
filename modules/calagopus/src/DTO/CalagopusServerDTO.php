@@ -87,7 +87,7 @@ class CalagopusServerDTO
             'deployment' => [
                 'location_uuids' => array_values($config->location_uuids ?? []),
                 'allow_overallocation' => false,
-                'allocations' => null,
+                'allocations' => $config->allocationDeployment(),
             ],
             'owner_uuid' => $owner->uuid,
             'egg_uuid' => $config->egg_uuid,

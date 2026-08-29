@@ -11,6 +11,16 @@
     </div>
 
     <div>
+        @include('admin/shared/input', ['name' => 'port_start', 'label' => __('calagopus::admin.config.port_start'), 'value' => $config->port_start, 'help' => __('calagopus::admin.config.port_range_help'), 'type' => 'number', 'min' => 1])
+    </div>
+    <div>
+        @include('admin/shared/input', ['name' => 'port_end', 'label' => __('calagopus::admin.config.port_end'), 'value' => $config->port_end, 'type' => 'number', 'min' => 1])
+    </div>
+    <div>
+        @include('admin/shared/checkbox', ['name' => 'dedicated_ip', 'label' => __('calagopus::admin.config.dedicated_ip'), 'value' => $config->dedicated_ip, 'help' => __('calagopus::admin.config.dedicated_ip_help')])
+    </div>
+
+    <div>
         @include('admin/shared/input', ['name' => 'cpu', 'label' => __('calagopus::admin.config.cpu'), 'value' => $config->cpu, 'help' => __('calagopus::admin.config.cpu_help'), 'type' => 'number', 'min' => 0])
     </div>
     <div>

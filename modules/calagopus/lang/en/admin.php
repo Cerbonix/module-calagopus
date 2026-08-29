@@ -8,6 +8,12 @@ return [
         'locations' => 'Locations',
         'locations_help' => 'The panel picks the node and the port itself among these locations. At least one is required, otherwise the order will fail.',
 
+        'port_start' => 'First port',
+        'port_end' => 'Last port',
+        'port_range_help' => 'Range the panel picks the server port from. Without a range no port is assigned at all and the server ships unreachable.',
+        'dedicated_ip' => 'Dedicated IP',
+        'dedicated_ip_help' => 'Requires an address carrying no other server. The order fails if none is free.',
+
         'cpu' => 'CPU',
         'cpu_help' => 'Percentage of one core: 100 for 1 vCPU, 200 for 2 vCPU. 0 for unlimited.',
         'memory' => 'Memory',

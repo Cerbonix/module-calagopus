@@ -8,6 +8,12 @@ return [
         'locations' => 'Emplacements',
         'locations_help' => 'Le panel choisit lui-même le nœud et le port parmi ces emplacements. Il en faut au moins un, sinon la commande échouera.',
 
+        'port_start' => 'Port de début',
+        'port_end' => 'Port de fin',
+        'port_range_help' => 'Plage dans laquelle le panel choisit le port du serveur. Sans plage, aucun port n\'est attribué et le serveur est injoignable.',
+        'dedicated_ip' => 'IP dédiée',
+        'dedicated_ip_help' => 'Exige une adresse IP ne portant aucun autre serveur. La commande échoue si aucune n\'est libre.',
+
         'cpu' => 'Processeur',
         'cpu_help' => 'Pourcentage d\'un cœur : 100 pour 1 vCPU, 200 pour 2 vCPU. 0 pour illimité.',
         'memory' => 'Mémoire',
