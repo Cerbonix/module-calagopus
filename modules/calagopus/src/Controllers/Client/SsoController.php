@@ -27,8 +27,8 @@ class SsoController extends Controller
             abort(404);
         }
 
+        // Not gated on the active status: a cancelled service still runs until it expires, and a missing server falls back on its own below.
         abort_if($service->type !== 'calagopus', 404);
-        abort_if(! $service->isActivated(), 404);
 
         $panel = $service->server;
 

@@ -102,6 +102,23 @@ class CalagopusSsoTest extends TestCase
         $this->assertStringNotContainsString('/api/auth/ssotickets/', $response->getTargetUrl());
     }
 
+    public function test_a_cancelled_service_can_still_open_its_running_server(): void
+    {
+        Http::fake([
+            '*/users/external/*' => Http::response(['user' => ['uuid' => '65e06000-9796-4f2f-ae5d-bd59b8120a90', 'email' => 'a@b.c', 'username' => 'ab']]),
+            '*/servers/external/*' => Http::response(['server' => $this->panelServer()]),
+            '*/api/settings' => Http::response(['app' => ['url' => 'https://panel.test']]),
+            '*/auth/ssotickets' => Http::response(['token' => str_repeat('t', 48), 'expires_in' => 60]),
+        ]);
+        $service = $this->service();
+        $service->update(['status' => Service::STATUS_CANCELLED]);
+
+        $this->actingAs($service->customer, 'web');
+        $response = (new \App\Modules\Calagopus\Controllers\Client\SsoController)->redirect($service->fresh());
+
+        $this->assertStringContainsString('/api/auth/ssotickets/', $response->getTargetUrl());
+    }
+
     private function panelServer(): array
     {
         return [
