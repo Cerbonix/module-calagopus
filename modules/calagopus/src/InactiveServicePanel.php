@@ -19,7 +19,7 @@ class InactiveServicePanel
     /**
      * The core blanks the panel as soon as a service leaves the active state, which cuts a customer off a server they still paid for.
      */
-    public static function compose(View $view): void
+    public function compose(View $view): void
     {
         $service = $view->getData()['service'] ?? null;
 
@@ -30,7 +30,7 @@ class InactiveServicePanel
         $rendered = (new CalagopusPanel)->render($service);
 
         if ($rendered->name() === self::UNAVAILABLE) {
-            $rendered = self::keptBackups($service);
+            $rendered = $this->keptBackups($service);
         }
 
         if ($rendered === null) {
@@ -41,7 +41,7 @@ class InactiveServicePanel
     }
 
     /** Once the server is gone, the only thing left worth showing is the way back to the backups we kept. */
-    private static function keptBackups(Service $service): ?View
+    private function keptBackups(Service $service): ?View
     {
         $kept = CalagopusBackupPurge::where('service_id', $service->id)->orderBy('purge_at');
         $count = $kept->count();

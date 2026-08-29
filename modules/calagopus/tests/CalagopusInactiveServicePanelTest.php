@@ -124,7 +124,7 @@ class CalagopusInactiveServicePanelTest extends TestCase
             ->with('service', $service)
             ->with('panel_html', $existing);
 
-        InactiveServicePanel::compose($view);
+        (new InactiveServicePanel)->compose($view);
 
         return (string) ($view->getData()['panel_html'] ?? '');
     }
