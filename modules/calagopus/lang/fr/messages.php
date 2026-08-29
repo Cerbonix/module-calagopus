@@ -17,4 +17,20 @@ return [
         'rate_limited' => 'Trop de requêtes envoyées au panel. Réessayez dans quelques instants.',
         'unexpected' => 'Réponse inattendue du panel. Détail : :detail',
     ],
+
+    'lifecycle' => [
+        'created' => 'Serveur créé sur le panel.',
+        'already_provisioned' => 'Un serveur existe déjà sur le panel pour ce service, aucune création effectuée.',
+        'suspended' => 'Serveur suspendu.',
+        'unsuspended' => 'Serveur réactivé.',
+        'nothing_to_do' => 'Le serveur était déjà actif, aucune action nécessaire.',
+        'customer_changed' => 'Propriétaire du serveur mis à jour sur le panel.',
+        'terminated' => 'Serveur supprimé du panel. Les sauvegardes du client ont été conservées.',
+        'already_gone' => 'Aucun serveur correspondant sur le panel, il a probablement déjà été supprimé.',
+        'not_found' => 'Aucun serveur correspondant à ce service sur le panel. Il a peut-être été supprimé à la main.',
+        'wrong_type' => 'Ce service n\'est pas un service Calagopus.',
+        'no_panel' => 'Aucun panel n\'est associé à ce service.',
+        'no_config' => 'Le produit n\'a pas de configuration Calagopus. Renseignez-la avant de provisionner.',
+        'panel_error' => 'Le panel a refusé l\'opération. Détail : :detail',
+    ],
 ];
