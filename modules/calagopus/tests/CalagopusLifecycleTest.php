@@ -140,6 +140,40 @@ class CalagopusLifecycleTest extends TestCase
         $this->assertNotSame('', $result->message);
     }
 
+    public function test_it_rebuilds_limits_from_scratch_so_replaying_an_option_does_not_stack_it(): void
+    {
+        Http::fake([
+            '*/servers/external/*' => Http::response(['server' => $this->panelServer()]),
+            '*' => Http::response([]),
+        ]);
+
+        $service = $this->service();
+        $option = \App\Models\Billing\ConfigOption::create([
+            'type' => 'number', 'key' => 'additional_memory', 'name' => 'Extra memory', 'sort_order' => 1,
+        ]);
+        \App\Models\Provisioning\ConfigOptionService::create([
+            'config_option_id' => $option->id,
+            'service_id' => $service->id,
+            'key' => 'additional_memory',
+            'value' => '2048',
+        ]);
+
+        $type = new CalagopusServerType;
+        $type->addOption($service->fresh(), $option);
+        $type->addOption($service->fresh(), $option);
+
+        $patches = [];
+        Http::assertSent(function ($request) use (&$patches) {
+            if ($request->method() === 'PATCH') {
+                $patches[] = $request->data()['limits']['memory'];
+            }
+
+            return true;
+        });
+
+        $this->assertSame([3072, 3072], $patches, 'the base 1024 plus the 2048 option, and never 5120');
+    }
+
     private function panelServer(): array
     {
         return [

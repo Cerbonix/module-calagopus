@@ -25,6 +25,8 @@ return [
         'unsuspended' => 'Server unsuspended.',
         'nothing_to_do' => 'The server was already active, no action needed.',
         'customer_changed' => 'Server owner updated on the panel.',
+        'upgraded' => 'Server resources updated on the panel. The node applies them on its side, which the panel does not confirm right away.',
+        'options_applied' => 'Options applied to the server. The node applies them on its side, which the panel does not confirm right away.',
         'terminated' => 'Server deleted from the panel. Customer backups were kept.',
         'already_gone' => 'No matching server on the panel, it was most likely already deleted.',
         'not_found' => 'No server on the panel matches this service. It may have been deleted by hand.',

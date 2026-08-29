@@ -12,8 +12,10 @@ use App\Abstracts\AbstractServerType;
 use App\DTO\Provisioning\ConnectionResponse;
 use App\DTO\Provisioning\ServiceStateChangeDTO;
 use App\Models\Account\Customer;
+use App\Models\Billing\ConfigOption;
 use App\Models\Provisioning\Server;
 use App\Models\Provisioning\Service;
+use App\Models\Store\Product;
 use App\Modules\Calagopus\DTO\CalagopusServerDTO;
 use App\Modules\Calagopus\DTO\CalagopusUserDTO;
 use App\Modules\Calagopus\Models\CalagopusConfig as ConfigModel;
@@ -24,6 +26,17 @@ class CalagopusServerType extends AbstractServerType
     public const SUPPORTED_MIN = '1.1.4';
 
     public const SUPPORTED_BELOW = '1.2.0';
+
+    /** Billable option key to the limit it increases, split by the two objects the panel patches separately. */
+    private const OPTION_TARGETS = [
+        'additional_cpu' => ['limits', 'cpu'],
+        'additional_memory' => ['limits', 'memory'],
+        'additional_disk' => ['limits', 'disk'],
+        'additional_swap' => ['limits', 'swap'],
+        'additional_databases' => ['features', 'databases'],
+        'additional_backups' => ['features', 'backups'],
+        'additional_allocations' => ['features', 'allocations'],
+    ];
 
     /** Endpoints read to prove the key actually carries each permission it needs. */
     private const REQUIRED_READS = [
@@ -156,6 +169,72 @@ class CalagopusServerType extends AbstractServerType
 
             return $this->lifecycle($service, true, 'terminated');
         });
+    }
+
+    public function upgradeService(Service $service, Product $product): ServiceStateChangeDTO
+    {
+        return $this->perform($service, function (Server $panel) use ($service, $product) {
+            $target = ConfigModel::where('product_id', $product->id)->first();
+
+            if ($target === null) {
+                return $this->lifecycle($service, false, 'no_config');
+            }
+
+            $server = CalagopusServerDTO::findByService($panel, $service);
+
+            if ($server === null) {
+                return $this->lifecycle($service, false, 'not_found');
+            }
+
+            $payload = $this->resourcePayload($target, $service) + ['egg_uuid' => $target->egg_uuid];
+
+            return $this->applyPatch($panel, $service, $server, $payload, 'upgraded');
+        });
+    }
+
+    public function addOption(Service $service, ConfigOption $configOption): ServiceStateChangeDTO
+    {
+        return $this->perform($service, function (Server $panel, ConfigModel $config) use ($service) {
+            $server = CalagopusServerDTO::findByService($panel, $service);
+
+            if ($server === null) {
+                return $this->lifecycle($service, false, 'not_found');
+            }
+
+            return $this->applyPatch($panel, $service, $server, $this->resourcePayload($config, $service), 'options_applied');
+        });
+    }
+
+    /**
+     * Rebuilds the whole limit set from the product plus every live option, so a replayed call cannot stack increments.
+     */
+    private function resourcePayload(ConfigModel $config, Service $service): array
+    {
+        $limits = $config->limits();
+        $features = $config->featureLimits();
+
+        foreach ($service->configoptions as $option) {
+            $target = self::OPTION_TARGETS[$option->key] ?? null;
+
+            if ($target === null || $this->optionExpired($option)) {
+                continue;
+            }
+
+            [$bucket, $field] = $target;
+
+            if ($bucket === 'limits') {
+                $limits[$field] += (int) $option->value;
+            } else {
+                $features[$field] += (int) $option->value;
+            }
+        }
+
+        return ['limits' => $limits, 'feature_limits' => $features];
+    }
+
+    private function optionExpired(mixed $option): bool
+    {
+        return $option->expires_at !== null && $option->expires_at->isPast();
     }
 
     public function getSupportedOptions(): array

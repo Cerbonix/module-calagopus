@@ -25,6 +25,8 @@ return [
         'unsuspended' => 'Serveur réactivé.',
         'nothing_to_do' => 'Le serveur était déjà actif, aucune action nécessaire.',
         'customer_changed' => 'Propriétaire du serveur mis à jour sur le panel.',
+        'upgraded' => 'Ressources du serveur mises à jour sur le panel. Le nœud les applique de son côté, ce que le panel ne confirme pas immédiatement.',
+        'options_applied' => 'Options appliquées au serveur. Le nœud les applique de son côté, ce que le panel ne confirme pas immédiatement.',
         'terminated' => 'Serveur supprimé du panel. Les sauvegardes du client ont été conservées.',
         'already_gone' => 'Aucun serveur correspondant sur le panel, il a probablement déjà été supprimé.',
         'not_found' => 'Aucun serveur correspondant à ce service sur le panel. Il a peut-être été supprimé à la main.',
