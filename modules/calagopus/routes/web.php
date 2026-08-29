@@ -16,4 +16,6 @@ Route::name('calagopus.')
         Route::get('/sso/{service}', [SsoController::class, 'redirect'])->name('sso');
         Route::get('/backups', [BackupController::class, 'index'])->name('backups.index');
         Route::delete('/backups', [BackupController::class, 'destroy'])->name('backups.destroy');
+        Route::get('/backups/{backup}/download', [BackupController::class, 'download'])->name('backups.download');
+        Route::post('/backups/preference/{service}', [BackupController::class, 'preference'])->name('backups.preference');
     });

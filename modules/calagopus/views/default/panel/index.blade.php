@@ -48,9 +48,41 @@
     </div>
 </div>
 
-<p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
-    {{ $retentionDays > 0
-        ? __('calagopus::client.retention.notice', ['days' => $retentionDays])
-        : __('calagopus::client.retention.notice_unlimited') }}
-    <a href="{{ route('calagopus.backups.index') }}" class="font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">{{ __('calagopus::client.retention.manage') }}</a>
-</p>
+<section class="mt-6 rounded-xl border border-gray-200 p-4 dark:border-gray-800" aria-labelledby="calagopus-retention-heading">
+    <h3 id="calagopus-retention-heading" class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ __('calagopus::client.retention.heading') }}</h3>
+
+    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+        {{ $retentionDays > 0
+            ? __('calagopus::client.retention.notice', ['days' => $retentionDays])
+            : __('calagopus::client.retention.notice_unlimited') }}
+    </p>
+
+    <form method="POST" action="{{ route('calagopus.backups.preference', ['service' => $service]) }}" class="mt-3">
+        @csrf
+        <fieldset>
+            <legend class="sr-only">{{ __('calagopus::client.retention.heading') }}</legend>
+
+            <div class="flex items-start gap-2">
+                <input type="radio" id="calagopus-keep-yes" name="keep" value="1" @checked($keepBackups) class="mt-1">
+                <label for="calagopus-keep-yes" class="text-sm text-gray-800 dark:text-gray-200">
+                    {{ $retentionDays > 0
+                        ? __('calagopus::client.retention.keep_days', ['days' => $retentionDays])
+                        : __('calagopus::client.retention.keep_unlimited') }}
+                </label>
+            </div>
+
+            <div class="mt-2 flex items-start gap-2">
+                <input type="radio" id="calagopus-keep-no" name="keep" value="0" @checked(! $keepBackups) class="mt-1">
+                <label for="calagopus-keep-no" class="text-sm text-gray-800 dark:text-gray-200">{{ __('calagopus::client.retention.discard') }}</label>
+            </div>
+        </fieldset>
+
+        <button type="submit" class="mt-3 inline-flex items-center rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800">
+            {{ __('calagopus::client.retention.save') }}
+        </button>
+    </form>
+
+    <p class="mt-3 text-sm">
+        <a href="{{ route('calagopus.backups.index') }}" class="font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">{{ __('calagopus::client.retention.manage') }}</a>
+    </p>
+</section>

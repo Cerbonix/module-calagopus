@@ -10,11 +10,14 @@ namespace App\Modules\Calagopus\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Calagopus\BackupPurger;
+use App\Modules\Calagopus\Http;
 use App\Modules\Calagopus\Models\CalagopusBackupPurge;
 use Illuminate\Http\Request;
 
 class BackupController extends Controller
 {
+    public const KEEP_ON_TERMINATION = 'calagopus_keep_backups';
+
     public function index()
     {
         $customer = $this->customer();
@@ -22,6 +25,41 @@ class BackupController extends Controller
         return view('calagopus::backups.index', [
             'entries' => $this->kept($customer->id)->with('service')->orderBy('purge_at')->get(),
         ]);
+    }
+
+    /**
+     * The panel hands back a signed URL, so the customer downloads straight from the node and our API key never leaves ClientXCMS.
+     */
+    public function download(CalagopusBackupPurge $backup)
+    {
+        $customer = $this->customer();
+
+        abort_if($this->kept($customer->id)->whereKey($backup->getKey())->doesntExist(), 404);
+
+        $panel = $backup->server;
+
+        abort_if($panel === null, 404);
+
+        $response = Http::callApi($panel, "nodes/{$backup->node_uuid}/backups/{$backup->backup_uuid}/download");
+        $url = $response->successful() ? ($response->json()['url'] ?? null) : null;
+
+        if (! is_string($url) || $url === '') {
+            return back()->with('error', __('calagopus::client.backups.download_failed'));
+        }
+
+        return redirect()->away($url);
+    }
+
+    public function preference(Request $request, \App\Models\Provisioning\Service $service)
+    {
+        $customer = $this->customer();
+
+        abort_if(! $customer->hasServicePermission($service, 'service.show'), 404);
+        abort_if($service->type !== 'calagopus', 404);
+
+        $service->attachMetadata(self::KEEP_ON_TERMINATION, $request->boolean('keep') ? '1' : '0');
+
+        return back()->with('success', __('calagopus::client.retention.saved'));
     }
 
     public function destroy(Request $request)

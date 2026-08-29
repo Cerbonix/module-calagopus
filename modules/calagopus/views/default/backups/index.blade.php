@@ -35,6 +35,7 @@
                                     <tr class="text-left text-gray-600 dark:text-gray-400">
                                         <th scope="col" class="py-2 pr-4 font-medium">{{ __('calagopus::client.backups.name') }}</th>
                                         <th scope="col" class="py-2 pr-4 font-medium">{{ __('calagopus::client.backups.purge_at') }}</th>
+                                        <th scope="col" class="py-2 pr-4 font-medium"><span class="sr-only">{{ __('calagopus::client.backups.actions') }}</span></th>
                                     </tr>
                                 </thead>
                                 <tbody class="text-gray-800 dark:text-gray-200">
@@ -42,6 +43,11 @@
                                         <tr class="border-t border-gray-200 dark:border-gray-800">
                                             <td class="py-2 pr-4">{{ $entry->backup_name ?? __('calagopus::client.backups.unnamed') }}</td>
                                             <td class="py-2 pr-4">{{ $entry->purge_at?->translatedFormat('d F Y') ?? __('calagopus::client.backups.no_limit') }}</td>
+                                            <td class="py-2 pr-4">
+                                                <a href="{{ route('calagopus.backups.download', ['backup' => $entry]) }}" class="font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                                    {{ __('calagopus::client.backups.download') }}<span class="sr-only"> {{ $entry->backup_name ?? __('calagopus::client.backups.unnamed') }}</span>
+                                                </a>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>

@@ -61,7 +61,7 @@ class CalagopusBackupRetentionTest extends TestCase
         $this->assertDatabaseCount('calagopus_backup_purges', 0);
     }
 
-    public function test_it_never_asks_the_panel_to_delete_backups_on_the_way_out(): void
+    public function test_it_never_asks_the_panel_to_delete_backups_unless_the_customer_asked(): void
     {
         $this->fakePanel();
 
@@ -69,6 +69,30 @@ class CalagopusBackupRetentionTest extends TestCase
 
         Http::assertSent(fn ($request) => $request->method() !== 'DELETE'
             || $request->data()['delete_backups'] === false);
+    }
+
+    public function test_a_customer_who_declined_retention_gets_their_backups_dropped_on_the_spot(): void
+    {
+        $this->fakePanel();
+        $service = $this->service(30);
+        $service->attachMetadata(\App\Modules\Calagopus\Controllers\Client\BackupController::KEEP_ON_TERMINATION, '0');
+
+        (new CalagopusServerType)->expireAccount($service->fresh());
+
+        Http::assertSent(fn ($request) => $request->method() !== 'DELETE'
+            || $request->data()['delete_backups'] === true);
+        $this->assertDatabaseCount('calagopus_backup_purges', 0);
+    }
+
+    public function test_an_explicit_choice_to_keep_behaves_like_the_default(): void
+    {
+        $this->fakePanel();
+        $service = $this->service(30);
+        $service->attachMetadata(\App\Modules\Calagopus\Controllers\Client\BackupController::KEEP_ON_TERMINATION, '1');
+
+        (new CalagopusServerType)->expireAccount($service->fresh());
+
+        $this->assertDatabaseCount('calagopus_backup_purges', 2);
     }
 
     public function test_the_purge_leaves_alone_a_backup_whose_retention_has_not_elapsed(): void

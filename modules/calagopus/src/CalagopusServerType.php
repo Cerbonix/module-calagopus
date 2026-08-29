@@ -16,6 +16,7 @@ use App\Models\Billing\ConfigOption;
 use App\Models\Provisioning\Server;
 use App\Models\Provisioning\Service;
 use App\Models\Store\Product;
+use App\Modules\Calagopus\Controllers\Client\BackupController;
 use App\Modules\Calagopus\DTO\CalagopusServerDTO;
 use App\Modules\Calagopus\DTO\CalagopusUserDTO;
 use App\Modules\Calagopus\Models\CalagopusBackupPurge;
@@ -161,11 +162,12 @@ class CalagopusServerType extends AbstractServerType
                 return $this->lifecycle($service, true, 'already_gone');
             }
 
-            $retention = (int) $config->backup_retention_days;
+            $keep = $service->getMetadata(BackupController::KEEP_ON_TERMINATION) !== '0';
+            $retention = $keep ? (int) $config->backup_retention_days : 0;
             $scheduled = CalagopusBackupPurge::recordFor($panel, $server, $service, $retention);
 
-            // delete_backups stays false: the panel would destroy them now, whereas the product decides how long they are kept.
-            $response = Http::callApi($panel, 'servers/'.$server->uuid, ['force' => false, 'delete_backups' => false], 'DELETE');
+            // The panel destroys backups immediately, so we only let it when the customer asked for it; otherwise retention decides.
+            $response = Http::callApi($panel, 'servers/'.$server->uuid, ['force' => false, 'delete_backups' => ! $keep], 'DELETE');
 
             if (! $response->successful()) {
                 return $this->lifecycle($service, false, 'panel_error', ['detail' => $response->errorMessage()]);

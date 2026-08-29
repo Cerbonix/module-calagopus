@@ -96,6 +96,40 @@ class CalagopusClientBackupsTest extends TestCase
         $this->assertNotNull($response->getSession()->get('error'));
     }
 
+    public function test_a_customer_cannot_download_someone_elses_backup(): void
+    {
+        Http::fake();
+        $theirs = $this->keptBackup();
+        $stranger = Customer::factory()->create();
+
+        $this->actingAs($stranger, 'web');
+
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        (new BackupController)->download($theirs);
+    }
+
+    public function test_the_owner_is_sent_to_the_url_the_panel_signed(): void
+    {
+        Http::fake(['*/download' => Http::response(['url' => 'https://node.test/download/abc'])]);
+        $mine = $this->keptBackup();
+
+        $this->actingAs($mine->service->customer, 'web');
+        $response = (new BackupController)->download($mine);
+
+        $this->assertSame('https://node.test/download/abc', $response->getTargetUrl());
+    }
+
+    public function test_a_backup_the_panel_will_not_serve_does_not_strand_the_customer(): void
+    {
+        Http::fake(['*' => Http::response(['errors' => ['nope']], 417)]);
+        $mine = $this->keptBackup();
+
+        $this->actingAs($mine->service->customer, 'web');
+        $response = (new BackupController)->download($mine);
+
+        $this->assertNotNull($response->getSession()->get('error'));
+    }
+
     private function keptBackup(): CalagopusBackupPurge
     {
         $service = Service::factory()->create([
