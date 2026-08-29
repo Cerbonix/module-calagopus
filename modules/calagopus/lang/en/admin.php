@@ -10,7 +10,7 @@ return [
         'limits' => 'Resources',
         'external_id' => 'External id',
         'suspended' => 'This server is suspended on the panel.',
-        'open' => 'Open in the panel',
+        'open' => 'Open the panel with your account',
         'new_window' => '(opens in a new tab)',
         'no_panel' => 'No panel is attached to this service.',
         'not_found' => 'No matching server on the panel. It may have been deleted by hand.',

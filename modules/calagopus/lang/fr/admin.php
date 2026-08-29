@@ -10,10 +10,10 @@ return [
         'limits' => 'Ressources',
         'external_id' => 'Identifiant externe',
         'suspended' => 'Ce serveur est suspendu sur le panel.',
-        'open' => 'Ouvrir dans le panel',
+        'open' => 'Ouvrir le panel avec votre compte',
         'new_window' => '(s\'ouvre dans un nouvel onglet)',
-        'no_panel' => 'Aucun panel n\'est associe a ce service.',
-        'not_found' => 'Aucun serveur correspondant sur le panel. Il a peut-etre ete supprime a la main.',
+        'no_panel' => 'Aucun panel n\'est associé à ce service.',
+        'not_found' => 'Aucun serveur correspondant sur le panel. Il a peut-être été supprimé à la main.',
     ],
 
     'import' => [
