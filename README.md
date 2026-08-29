@@ -155,7 +155,7 @@ Sans elle, le client qui clique sur « Ouvrir le panel » arrive sur la page de 
 
 | | |
 |---|---|
-| Côté panel | L'extension [`Cerbonix/calagopus-sso`](https://github.com/Cerbonix/calagopus-sso) installée, ce qui suppose un panel en image `heavy`. Sa propre documentation couvre la construction et l'installation |
+| Côté panel | L'extension [`Cerbonix/calagopus-sso-clientxcms`](https://github.com/Cerbonix/calagopus-sso-clientxcms) installée, ce qui suppose un panel en image `heavy`. Sa propre documentation couvre la construction et l'installation |
 | Côté clé API | La permission `ssotickets.manage` en plus des autres |
 | Des deux côtés | Un même secret partagé |
 
@@ -374,7 +374,7 @@ Without it, a customer clicking "Open the panel" lands on the panel login page a
 
 | | |
 |---|---|
-| On the panel | The [`Cerbonix/calagopus-sso`](https://github.com/Cerbonix/calagopus-sso) extension installed, which implies a panel running the `heavy` image. Its own documentation covers building and installing it |
+| On the panel | The [`Cerbonix/calagopus-sso-clientxcms`](https://github.com/Cerbonix/calagopus-sso-clientxcms) extension installed, which implies a panel running the `heavy` image. Its own documentation covers building and installing it |
 | On the API key | The `ssotickets.manage` permission, on top of the others |
 | On both sides | One shared secret |
 
