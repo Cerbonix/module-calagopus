@@ -69,6 +69,21 @@ Deux règles :
 
 Laisser `allowed_ips` vide désactive la restriction. C'est plus simple, et moins sûr.
 
+## Deux adresses, deux usages
+
+Le module utilise **deux adresses différentes**, et les confondre est le piège le plus courant à la mise en service.
+
+| Adresse | D'où elle vient | Qui l'utilise |
+|---|---|---|
+| Adresse d'API | Le champ « Nom d'hôte » du serveur, dans ClientXCMS | ClientXCMS, pour appeler le panel de serveur à serveur |
+| Adresse publique | Le réglage `app.url` **du panel**, lu via `GET /api/settings` et mis en cache 5 minutes | Le navigateur du client, quand il clique sur « Ouvrir le panel » |
+
+Le module ne recopie pas l'adresse publique : il la **demande au panel**, qui est seul à savoir où il se croit. Si le panel ne répond rien d'exploitable, le module retombe sur l'adresse d'API.
+
+**Conséquence à vérifier une fois, au déploiement.** Si `app.url` est mal renseigné dans votre panel, vos clients recevront un lien mort, et le test de connexion ne le verra pas : il n'emprunte que l'adresse d'API. Les deux doivent être correctes, et elles diffèrent légitimement dès que le panel est derrière un réseau interne, un mandataire ou un VPN.
+
+Le même partage existe côté nœud : renseignez son `public_url` si son `url` n'est pas joignable depuis un navigateur, sans quoi la console du client restera déconnectée.
+
 ## Configurer un produit
 
 ### Les unités ne sont pas celles de Pterodactyl
@@ -194,6 +209,21 @@ Two rules:
 2. Add updating this list to your node provisioning runbook.
 
 Leaving `allowed_ips` empty disables the restriction. Simpler, and less safe.
+
+## Two addresses, two uses
+
+The module uses **two different addresses**, and mixing them up is the most common go-live trap.
+
+| Address | Where it comes from | Who uses it |
+|---|---|---|
+| API address | The server "Hostname" field, in ClientXCMS | ClientXCMS, to call the panel server to server |
+| Public address | The panel's own `app.url` setting, read through `GET /api/settings` and cached for 5 minutes | The customer's browser, when clicking "Open the panel" |
+
+The module does not copy the public address: it **asks the panel**, which alone knows where it thinks it lives. If the panel returns nothing usable, the module falls back to the API address.
+
+**Check this once, at deployment.** If `app.url` is wrong in your panel, your customers get a dead link, and the connection test will not catch it: it only ever uses the API address. Both must be correct, and they legitimately differ as soon as the panel sits behind an internal network, a proxy or a VPN.
+
+The same split exists on the node: set its `public_url` when its `url` is not reachable from a browser, otherwise the customer console stays disconnected.
 
 ## Configuring a product
 
