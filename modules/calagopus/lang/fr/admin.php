@@ -2,6 +2,7 @@
 
 return [
     'panel' => [
+        'title' => 'Serveur sur le panel',
         'uuid' => 'Identifiant du serveur',
         'address' => 'Adresse',
         'no_address' => 'Aucune allocation',
