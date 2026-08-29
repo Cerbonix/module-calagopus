@@ -171,7 +171,16 @@ php artisan calagopus:sso --secret=…  # impose votre propre secret
 
 Elle donne d'abord le secret au panel. S'il refuse, ClientXCMS conserve l'ancien : jamais de configuration à moitié appliquée.
 
-Le test de connexion du panel indique aussi l'état du SSO, donc l'interface vous dira si quelque chose manque.
+Le secret doit être connu **des deux côtés**. Le saisir à la main dans le champ « Nom d'utilisateur » ne configure donc que la moitié ClientXCMS : le panel, lui, n'apprend rien, et vos clients continuent d'arriver sur la page de connexion. C'est tout l'objet de la commande, qui sert les deux côtés d'un coup.
+
+Le test de connexion du serveur demande réellement un ticket au panel pour trancher, et vous dit lequel de ces cas vous concerne :
+
+| Réponse du test | Ce qu'elle veut dire |
+|---|---|
+| L'authentification unique est configurée | Les deux secrets s'accordent, rien à faire |
+| Le secret partagé ne correspond pas | Les deux côtés divergent, rejouez la commande |
+| L'extension n'est pas installée sur le panel | Voir les prérequis ci-dessus |
+| L'extension ne répond pas | Le panel est joignable, son extension non |
 
 ### Où vit le secret, et pourquoi là
 
@@ -390,7 +399,16 @@ php artisan calagopus:sso --secret=…  # use your own secret
 
 It gives the secret to the panel first. If the panel refuses, ClientXCMS keeps the previous one: never a half-applied setup.
 
-The panel connection test also reports the SSO state, so the interface tells you when something is missing.
+The secret has to be known **on both sides**. Typing it by hand into the "Nom d'utilisateur" field therefore configures the ClientXCMS half only: the panel learns nothing, and your customers keep landing on the login page. That is what the command is for, it serves both sides at once.
+
+The server connection test actually asks the panel for a ticket to settle it, and tells you which case you are in:
+
+| Test answer | What it means |
+|---|---|
+| Single sign-on is configured | Both secrets agree, nothing to do |
+| The shared secret does not match | The two sides diverge, run the command again |
+| The extension is not installed on the panel | See the requirements above |
+| The extension does not answer | The panel is reachable, its extension is not |
 
 ### Where the secret lives, and why there
 
