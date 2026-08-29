@@ -9,6 +9,7 @@
 namespace App\Modules\Calagopus;
 
 use App\Abstracts\AbstractProductType;
+use App\Contracts\Provisioning\PanelProvisioningInterface;
 use App\Contracts\Provisioning\ServerTypeInterface;
 use App\Contracts\Store\ProductConfigInterface;
 
@@ -28,5 +29,10 @@ class CalagopusProductType extends AbstractProductType
     public function config(): ?ProductConfigInterface
     {
         return new CalagopusConfig;
+    }
+
+    public function panel(): ?PanelProvisioningInterface
+    {
+        return new CalagopusPanel;
     }
 }
