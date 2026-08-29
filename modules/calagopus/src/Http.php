@@ -9,11 +9,14 @@
 namespace App\Modules\Calagopus;
 
 use App\Models\Provisioning\Server;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http as HttpClient;
 
 class Http
 {
     private const TIMEOUT = 10;
+
+    private const PUBLIC_URL_TTL = 300;
 
     public static function callApi(Server $server, string $endpoint, array $data = [], string $method = 'GET'): CalagopusResponse
     {
@@ -29,6 +32,23 @@ class Http
         } catch (\Throwable $e) {
             return CalagopusResponse::unreachable($e->getMessage());
         }
+    }
+
+    /**
+     * The address ClientXCMS calls is not always the one a browser can open, so the panel is asked where it thinks it lives.
+     */
+    public static function publicUrl(Server $server): string
+    {
+        return Cache::remember("calagopus.public_url.{$server->id}", self::PUBLIC_URL_TTL, function () use ($server) {
+            try {
+                $response = HttpClient::acceptJson()->timeout(self::TIMEOUT)->get(self::baseUrl($server).'/api/settings');
+                $url = $response->successful() ? (string) ($response->json()['app']['url'] ?? '') : '';
+            } catch (\Throwable) {
+                $url = '';
+            }
+
+            return rtrim($url, '/') ?: self::baseUrl($server);
+        });
     }
 
     public static function baseUrl(Server $server): string

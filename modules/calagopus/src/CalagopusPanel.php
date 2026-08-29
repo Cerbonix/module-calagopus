@@ -37,7 +37,7 @@ class CalagopusPanel extends AbstractPanelProvisioning
         return view('calagopus::panel.index', [
             'service' => $service,
             'server' => $server,
-            'panelUrl' => Http::baseUrl($panel).'/server/'.$server->uuid,
+            'panelUrl' => Http::publicUrl($panel).'/server/'.$server->uuid,
         ]);
     }
 }
