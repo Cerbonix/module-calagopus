@@ -1,6 +1,19 @@
 <?php
 
 return [
+    'import' => [
+        'server' => 'Server to attach',
+        'server_help' => 'Pick the existing panel server this service should represent from now on.',
+        'taken_option' => ':name (already attached to service #:service)',
+        'no_panel' => 'No panel is attached to this service. Set it before importing.',
+        'empty' => 'The panel returns no server, or it is unreachable.',
+        'imported' => 'Server attached to this service.',
+        'already_linked' => 'This server is already attached to this service, nothing changed.',
+        'taken' => 'This server is already attached to service #:service. Detach it first, otherwise the other service would lose its own.',
+        'unknown_server' => 'No server matches this identifier on the panel.',
+        'panel_error' => 'The panel refused the attachment. Detail: :detail',
+    ],
+
     'config' => [
         'server' => 'Calagopus panel',
         'egg' => 'Egg',

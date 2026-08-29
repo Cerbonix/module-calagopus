@@ -1,6 +1,19 @@
 <?php
 
 return [
+    'import' => [
+        'server' => 'Serveur à rattacher',
+        'server_help' => 'Choisissez le serveur existant sur le panel que ce service doit désormais représenter.',
+        'taken_option' => ':name (déjà rattaché au service #:service)',
+        'no_panel' => 'Aucun panel n\'est associé à ce service. Renseignez-le avant d\'importer.',
+        'empty' => 'Le panel ne renvoie aucun serveur, ou il est injoignable.',
+        'imported' => 'Serveur rattaché à ce service.',
+        'already_linked' => 'Ce serveur est déjà rattaché à ce service, rien n\'a été modifié.',
+        'taken' => 'Ce serveur est déjà rattaché au service #:service. Détachez-le d\'abord, sinon l\'autre service perdrait le sien.',
+        'unknown_server' => 'Aucun serveur ne correspond à cet identifiant sur le panel.',
+        'panel_error' => 'Le panel a refusé le rattachement. Détail : :detail',
+    ],
+
     'config' => [
         'server' => 'Panel Calagopus',
         'egg' => 'Egg',

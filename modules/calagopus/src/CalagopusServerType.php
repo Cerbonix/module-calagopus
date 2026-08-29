@@ -245,6 +245,11 @@ class CalagopusServerType extends AbstractServerType
         return $option->expires_at !== null && $option->expires_at->isPast();
     }
 
+    public function importService(): ?\App\Contracts\Provisioning\ImportServiceInterface
+    {
+        return new ImportServiceCalagopus;
+    }
+
     public function getSupportedOptions(): array
     {
         return [
