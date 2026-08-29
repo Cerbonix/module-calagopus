@@ -16,6 +16,9 @@ return [
         'panel_refused' => 'Le panel a refusé d\'exécuter l\'opération. Détail : :detail',
         'rate_limited' => 'Trop de requêtes envoyées au panel. Réessayez dans quelques instants.',
         'unexpected' => 'Réponse inattendue du panel. Détail : :detail',
+        'sso_ready' => 'L\'authentification unique est configurée.',
+        'sso_absent' => 'L\'authentification unique n\'est pas configurée : renseignez le secret partagé dans le champ Nom d\'utilisateur pour que vos clients accèdent au panel sans se reconnecter.',
+        'sso_unreachable' => 'L\'authentification unique est configurée mais l\'extension du panel ne répond pas.',
     ],
 
     'lifecycle' => [

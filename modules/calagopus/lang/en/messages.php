@@ -16,6 +16,9 @@ return [
         'panel_refused' => 'The panel refused to carry out the operation. Detail: :detail',
         'rate_limited' => 'Too many requests sent to the panel. Try again shortly.',
         'unexpected' => 'Unexpected response from the panel. Detail: :detail',
+        'sso_ready' => 'Single sign-on is configured.',
+        'sso_absent' => 'Single sign-on is not configured: put the shared secret in the Username field so your customers reach the panel without signing in again.',
+        'sso_unreachable' => 'Single sign-on is configured but the panel extension does not answer.',
     ],
 
     'lifecycle' => [

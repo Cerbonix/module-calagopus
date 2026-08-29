@@ -15,6 +15,7 @@ Module de provisioning ClientXCMS pour **Calagopus**, panel de gestion de serveu
 | Purge des sauvegardes | Tâche planifiée qui supprime les sauvegardes conservées une fois leur durée écoulée |
 | Espace client | Adresse de connexion, ressources, état, accès au panel |
 | Import | Rattache un serveur déjà présent sur le panel à un service existant |
+| Authentification unique | Le client arrive connecté sur son serveur, sans saisir de mot de passe. Nécessite l'extension du panel |
 
 ## Prérequis
 
@@ -118,6 +119,53 @@ php artisan calagopus:purge-backups --limit=50  # borne un passage
 
 Lancez-la une première fois avec `--dry-run`.
 
+## Authentification unique (SSO)
+
+Sans elle, le client qui clique sur « Ouvrir le panel » arrive sur la page de connexion du panel et doit saisir un mot de passe. Avec elle, il arrive **déjà connecté sur son serveur**.
+
+### Ce qu'il faut
+
+| | |
+|---|---|
+| Côté panel | L'extension [`Cerbonix/calagopus-sso`](https://github.com/Cerbonix/calagopus-sso) installée, ce qui suppose une image `heavy` |
+| Côté clé API | La permission `ssotickets.manage` en plus des autres |
+| Des deux côtés | Un même secret partagé |
+
+### Configuration
+
+Une seule commande, qui s'occupe des deux côtés :
+
+```sh
+php artisan calagopus:sso            # génère le secret et le pose partout
+php artisan calagopus:sso --show     # dit simplement si c'est configuré
+php artisan calagopus:sso --secret=…  # impose votre propre secret
+```
+
+Elle donne d'abord le secret au panel. S'il refuse, ClientXCMS conserve l'ancien : jamais de configuration à moitié appliquée.
+
+Le test de connexion du panel indique aussi l'état du SSO, donc l'interface vous dira si quelque chose manque.
+
+### Où vit le secret, et pourquoi là
+
+Côté ClientXCMS, dans le champ **Nom d'utilisateur** du serveur. Ce nom ne l'annonce pas, et c'est délibéré : ce champ est **chiffré au repos**, contrairement aux métadonnées du serveur, qui sont stockées en clair. Un secret partagé ne se range pas en clair, même dans sa propre base.
+
+Vous n'avez normalement pas à y toucher : la commande ci-dessus l'écrit pour vous.
+
+Côté panel, le secret est stocké chiffré dans les réglages de l'extension.
+
+### Comment ça marche
+
+1. Le client clique sur « Ouvrir le panel » dans son espace client.
+2. ClientXCMS vérifie que le service lui appartient, puis demande un **ticket** au panel, en présentant le secret partagé.
+3. Le panel renvoie un ticket à usage unique, valable une minute.
+4. Le client est redirigé dessus, le panel ouvre sa session et l'amène sur son serveur.
+
+Le secret ne quitte jamais le dialogue entre les deux serveurs : il ne passe ni par le navigateur, ni par une URL.
+
+### Si le SSO n'est pas configuré
+
+Rien ne casse. Le bouton renvoie le client vers le panel comme un lien ordinaire, il s'y connecte lui-même. La même chose s'applique si le panel ne répond pas : le client n'est jamais laissé sans issue.
+
 ## Importer un serveur existant
 
 Depuis la fiche d'un service, choisissez le serveur du panel à rattacher. Un serveur déjà rattaché à un autre service est **refusé**, pas volé : l'identifiant externe est la clé de réconciliation, l'écraser rendrait l'autre service orphelin. Réimporter le même serveur sur le même service ne change rien.
@@ -156,6 +204,7 @@ ClientXCMS provisioning module for **Calagopus**, a game server management panel
 | Backup purge | Scheduled task deleting kept backups once their retention has elapsed |
 | Client area | Connection address, resources, state, panel access |
 | Import | Attaches a server already present on the panel to an existing service |
+| Single sign-on | The customer lands signed in on their server, with no password to type. Requires the panel extension |
 
 ## Requirements
 
@@ -258,6 +307,53 @@ php artisan calagopus:purge-backups --limit=50  # bound a single run
 ```
 
 Run it with `--dry-run` the first time.
+
+## Single sign-on (SSO)
+
+Without it, a customer clicking "Open the panel" lands on the panel login page and has to type a password. With it, they land **already signed in on their server**.
+
+### What it takes
+
+| | |
+|---|---|
+| On the panel | The [`Cerbonix/calagopus-sso`](https://github.com/Cerbonix/calagopus-sso) extension installed, which implies a `heavy` image |
+| On the API key | The `ssotickets.manage` permission, on top of the others |
+| On both sides | One shared secret |
+
+### Setting it up
+
+A single command handles both sides:
+
+```sh
+php artisan calagopus:sso            # generate the secret and set it everywhere
+php artisan calagopus:sso --show     # just report whether it is configured
+php artisan calagopus:sso --secret=…  # use your own secret
+```
+
+It gives the secret to the panel first. If the panel refuses, ClientXCMS keeps the previous one: never a half-applied setup.
+
+The panel connection test also reports the SSO state, so the interface tells you when something is missing.
+
+### Where the secret lives, and why there
+
+On the ClientXCMS side, in the server **Username** field. That name does not advertise it, and that is deliberate: this field is **encrypted at rest**, unlike server metadata, which is stored in clear text. A shared secret does not belong in clear text, not even in your own database.
+
+You normally never touch it: the command above writes it for you.
+
+On the panel side, the secret is stored encrypted in the extension settings.
+
+### How it works
+
+1. The customer clicks "Open the panel" in the client area.
+2. ClientXCMS checks the service is theirs, then asks the panel for a **ticket**, presenting the shared secret.
+3. The panel returns a single-use ticket, valid for one minute.
+4. The customer is redirected onto it, the panel opens their session and takes them to their server.
+
+The secret never leaves the server-to-server conversation: it goes through neither the browser nor a URL.
+
+### When SSO is not configured
+
+Nothing breaks. The button sends the customer to the panel as a plain link and they sign in themselves. Same if the panel does not answer: the customer is never left stranded.
 
 ## Importing an existing server
 

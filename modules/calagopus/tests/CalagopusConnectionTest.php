@@ -122,11 +122,35 @@ class CalagopusConnectionTest extends TestCase
         $result = (new CalagopusServerType)->testConnection($this->params());
 
         $this->assertTrue($result->successful());
-        $this->assertSame(__('calagopus::messages.connection.ok_untested_version', [
+        $this->assertStringStartsWith(__('calagopus::messages.connection.ok_untested_version', [
             'version' => '1.9.0',
             'min' => CalagopusServerType::SUPPORTED_MIN,
             'below' => CalagopusServerType::SUPPORTED_BELOW,
         ]), $result->toString());
+    }
+
+    public function test_it_says_when_single_sign_on_is_still_to_be_set_up(): void
+    {
+        Http::fake([
+            '*/system/overview' => Http::response(['version' => '1.1.4']),
+            '*' => Http::response(['data' => []]),
+        ]);
+
+        $result = (new CalagopusServerType)->testConnection($this->params(['username' => '']));
+
+        $this->assertStringContainsString(__('calagopus::messages.connection.sso_absent'), $result->toString());
+    }
+
+    public function test_it_says_when_single_sign_on_is_ready(): void
+    {
+        Http::fake([
+            '*/system/overview' => Http::response(['version' => '1.1.4']),
+            '*' => Http::response(['data' => []]),
+        ]);
+
+        $result = (new CalagopusServerType)->testConnection($this->params(['username' => str_repeat('s', 48)]));
+
+        $this->assertStringContainsString(__('calagopus::messages.connection.sso_ready'), $result->toString());
     }
 
     public function test_it_names_every_permission_the_key_is_missing(): void

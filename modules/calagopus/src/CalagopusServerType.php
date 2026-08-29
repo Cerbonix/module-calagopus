@@ -87,7 +87,7 @@ class CalagopusServerType extends AbstractServerType
 
         $version = (string) ($overview->json()['version'] ?? '');
 
-        return $this->result(true, $this->successMessage($version));
+        return $this->result(true, $this->successMessage($version).' '.$this->ssoState($server));
     }
 
     public function createAccount(Service $service): ServiceStateChangeDTO
@@ -337,6 +337,20 @@ class CalagopusServerType extends AbstractServerType
         }
 
         return $missing;
+    }
+
+    /**
+     * Surfaces whether single sign-on is wired, which is otherwise invisible until a customer clicks the button.
+     */
+    private function ssoState(Server $server): string
+    {
+        if (trim((string) $server->username) === '') {
+            return $this->trans('sso_absent');
+        }
+
+        return Http::callPanel($server, 'auth/ssotickets', ['secret' => '', 'user_uuid' => '00000000-0000-0000-0000-000000000000'])->status() === 0
+            ? $this->trans('sso_unreachable')
+            : $this->trans('sso_ready');
     }
 
     private function successMessage(string $version): string

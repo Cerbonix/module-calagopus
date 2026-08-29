@@ -8,6 +8,7 @@
 
 namespace App\Modules\Calagopus;
 
+use App\Modules\Calagopus\Commands\ConfigureSso;
 use App\Modules\Calagopus\Commands\PurgeExpiredBackups;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Console\Scheduling\Schedule;
@@ -35,7 +36,7 @@ class CalagopusServiceProvider extends \App\Extensions\BaseModuleServiceProvider
         \Route::middleware('web')->group(module_path('calagopus', 'routes/web.php'));
 
         if ($this->app->runningInConsole()) {
-            $this->commands([PurgeExpiredBackups::class]);
+            $this->commands([PurgeExpiredBackups::class, ConfigureSso::class]);
         }
 
         $this->registerSchedule();
