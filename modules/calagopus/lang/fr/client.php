@@ -12,6 +12,10 @@ return [
     'open_panel' => 'Ouvrir le panel',
     'new_window' => '(s\'ouvre dans un nouvel onglet)',
 
+    'sso' => [
+        'unavailable' => 'Le panel n\'est pas joignable pour le moment.',
+    ],
+
     'unit' => [
         'mb' => 'Mo',
         'gb' => 'Go',

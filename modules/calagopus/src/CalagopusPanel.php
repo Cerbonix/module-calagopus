@@ -62,6 +62,7 @@ class CalagopusPanel extends AbstractPanelProvisioning
             'service' => $service,
             'server' => $server,
             'panelUrl' => Http::publicUrl($panel).'/server/'.$server->uuid,
+            'ssoUrl' => route('calagopus.sso', ['service' => $service]),
         ]);
     }
 }

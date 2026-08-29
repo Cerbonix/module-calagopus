@@ -35,6 +35,22 @@ class Http
     }
 
     /**
+     * Reaches a panel route outside /api/admin, which the SSO extension mounts under /api/auth.
+     */
+    public static function callPanel(Server $server, string $endpoint, array $data = [], string $method = 'POST'): CalagopusResponse
+    {
+        try {
+            $response = HttpClient::acceptJson()
+                ->timeout(self::TIMEOUT)
+                ->send($method, self::baseUrl($server).'/api/'.ltrim($endpoint, '/'), ['json' => $data]);
+
+            return CalagopusResponse::fromResponse($response);
+        } catch (\Throwable $e) {
+            return CalagopusResponse::unreachable($e->getMessage());
+        }
+    }
+
+    /**
      * The address ClientXCMS calls is not always the one a browser can open, so the panel is asked where it thinks it lives.
      */
     public static function publicUrl(Server $server): string

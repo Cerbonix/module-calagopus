@@ -9,7 +9,9 @@
 namespace App\Modules\Calagopus;
 
 use App\Modules\Calagopus\Commands\PurgeExpiredBackups;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Console\Scheduling\Schedule;
+use RateLimiter;
 
 class CalagopusServiceProvider extends \App\Extensions\BaseModuleServiceProvider
 {
@@ -21,10 +23,16 @@ class CalagopusServiceProvider extends \App\Extensions\BaseModuleServiceProvider
 
     public function boot(): void
     {
+        RateLimiter::for('calagopus-sso', function ($request) {
+            return Limit::perMinute(10)->by(optional($request->user())->id ?: $request->ip());
+        });
+
         $this->loadViews();
         $this->loadTranslations();
         $this->loadMigrations();
         $this->registerProductTypes();
+
+        \Route::middleware('web')->group(module_path('calagopus', 'routes/web.php'));
 
         if ($this->app->runningInConsole()) {
             $this->commands([PurgeExpiredBackups::class]);

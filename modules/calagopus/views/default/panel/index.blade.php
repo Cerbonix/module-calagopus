@@ -41,7 +41,7 @@
 
 <div class="mt-2">
     <div class="flex mt-2">
-        <a href="{{ $panelUrl }}" target="_blank" rel="noopener noreferrer" class="w-full btn-primary text-center py-2 px-4">
+        <a href="{{ $ssoUrl }}" target="_blank" rel="noopener noreferrer" class="w-full btn-primary text-center py-2 px-4">
             {{ __('calagopus::client.open_panel') }}
             <span class="sr-only">{{ __('calagopus::client.new_window') }}</span>
         </a>

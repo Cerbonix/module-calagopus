@@ -12,6 +12,10 @@ return [
     'open_panel' => 'Open the panel',
     'new_window' => '(opens in a new tab)',
 
+    'sso' => [
+        'unavailable' => 'The panel is not reachable right now.',
+    ],
+
     'unit' => [
         'mb' => 'MB',
         'gb' => 'GB',
