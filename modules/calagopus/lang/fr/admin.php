@@ -1,6 +1,20 @@
 <?php
 
 return [
+    'panel' => [
+        'uuid' => 'Identifiant du serveur',
+        'address' => 'Adresse',
+        'no_address' => 'Aucune allocation',
+        'node' => 'Noeud',
+        'limits' => 'Ressources',
+        'external_id' => 'Identifiant externe',
+        'suspended' => 'Ce serveur est suspendu sur le panel.',
+        'open' => 'Ouvrir dans le panel',
+        'new_window' => '(s\'ouvre dans un nouvel onglet)',
+        'no_panel' => 'Aucun panel n\'est associe a ce service.',
+        'not_found' => 'Aucun serveur correspondant sur le panel. Il a peut-etre ete supprime a la main.',
+    ],
+
     'import' => [
         'server' => 'Serveur à rattacher',
         'server_help' => 'Choisissez le serveur existant sur le panel que ce service doit désormais représenter.',

@@ -1,6 +1,20 @@
 <?php
 
 return [
+    'panel' => [
+        'uuid' => 'Server identifier',
+        'address' => 'Address',
+        'no_address' => 'No allocation',
+        'node' => 'Node',
+        'limits' => 'Resources',
+        'external_id' => 'External id',
+        'suspended' => 'This server is suspended on the panel.',
+        'open' => 'Open in the panel',
+        'new_window' => '(opens in a new tab)',
+        'no_panel' => 'No panel is attached to this service.',
+        'not_found' => 'No matching server on the panel. It may have been deleted by hand.',
+    ],
+
     'import' => [
         'server' => 'Server to attach',
         'server_help' => 'Pick the existing panel server this service should represent from now on.',
