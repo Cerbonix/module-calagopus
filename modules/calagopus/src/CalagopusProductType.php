@@ -10,6 +10,7 @@ namespace App\Modules\Calagopus;
 
 use App\Abstracts\AbstractProductType;
 use App\Contracts\Provisioning\ServerTypeInterface;
+use App\Contracts\Store\ProductConfigInterface;
 
 class CalagopusProductType extends AbstractProductType
 {
@@ -22,5 +23,10 @@ class CalagopusProductType extends AbstractProductType
     public function server(): ?ServerTypeInterface
     {
         return new CalagopusServerType;
+    }
+
+    public function config(): ?ProductConfigInterface
+    {
+        return new CalagopusConfig;
     }
 }
