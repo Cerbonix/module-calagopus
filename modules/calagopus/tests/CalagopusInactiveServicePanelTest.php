@@ -100,6 +100,33 @@ class CalagopusInactiveServicePanelTest extends TestCase
         $this->assertSame('', $this->composed($service));
     }
 
+    public function test_the_live_refresh_does_not_wipe_the_panel(): void
+    {
+        $this->fakePanel(serverExists: true);
+        $service = $this->service(Service::STATUS_CANCELLED);
+
+        $response = new \Illuminate\Http\JsonResponse(['panel_html' => '', 'status_badge_html' => '<span></span>']);
+        $request = \Illuminate\Http\Request::create('/client/services/'.$service->uuid.'/status?panel=1');
+        $request->setRouteResolver(fn () => new class($service)
+        {
+            public function __construct(private $service) {}
+
+            public function getName(): string
+            {
+                return 'front.services.status';
+            }
+
+            public function parameter(string $key)
+            {
+                return $this->service;
+            }
+        });
+
+        $out = (new \App\Modules\Calagopus\Middleware\KeepInactivePanel)->handle($request, fn () => $response);
+
+        $this->assertStringContainsString(route('calagopus.sso', ['service' => $service]), $out->getData(true)['panel_html']);
+    }
+
     private function fakePanel(bool $serverExists): void
     {
         Http::fake([

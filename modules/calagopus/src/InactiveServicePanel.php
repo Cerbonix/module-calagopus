@@ -16,15 +16,25 @@ class InactiveServicePanel
 {
     private const UNAVAILABLE = 'calagopus::panel.unavailable';
 
-    /**
-     * The core blanks the panel as soon as a service leaves the active state, which cuts a customer off a server they still paid for.
-     */
     public function compose(View $view): void
     {
         $service = $view->getData()['service'] ?? null;
+        $html = $service instanceof Service ? $this->htmlFor($service) : null;
 
-        if (! $service instanceof Service || $service->type !== 'calagopus' || $service->isActivated()) {
+        if ($html === null) {
             return;
+        }
+
+        $view->with('panel_html', ($view->getData()['panel_html'] ?? '').$html);
+    }
+
+    /**
+     * The core blanks the panel as soon as a service leaves the active state, which cuts a customer off a server they still paid for.
+     */
+    public function htmlFor(Service $service): ?string
+    {
+        if ($service->type !== 'calagopus' || $service->isActivated()) {
+            return null;
         }
 
         $rendered = (new CalagopusPanel)->render($service);
@@ -33,11 +43,7 @@ class InactiveServicePanel
             $rendered = $this->keptBackups($service);
         }
 
-        if ($rendered === null) {
-            return;
-        }
-
-        $view->with('panel_html', ($view->getData()['panel_html'] ?? '').$rendered->render());
+        return $rendered?->render();
     }
 
     /** Once the server is gone, the only thing left worth showing is the way back to the backups we kept. */

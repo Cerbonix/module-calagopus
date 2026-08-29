@@ -150,7 +150,9 @@ Cet encart passe par un composeur de vue, parce que le noyau vide le panel du mo
 
 Entre la résiliation et l'expiration, le serveur continue de tourner et le client a payé pour cette période. Le noyau, lui, vide le panel dès que le statut n'est plus actif : sans intervention, le client perd l'adresse de connexion, le bouton d'ouverture du panel et l'authentification unique alors que son serveur fonctionne.
 
-Le module rétablit donc le panel complet tant que le serveur existe sur le panel, et bascule sur l'encart des sauvegardes une fois qu'il a été supprimé. Le client y retrouve ses sauvegardes conservées, leur date de suppression automatique, un lien de téléchargement et un bouton de suppression immédiate protégé par une confirmation.
+Le module rétablit donc le panel complet tant que le serveur existe sur le panel, et bascule sur l'encart des sauvegardes une fois qu'il a été supprimé.
+
+Deux chemins mènent à ce rendu et tous deux sont couverts : l'affichage initial de la page, par un composeur de vue, et le rafraîchissement automatique toutes les quelques secondes, qui réinterroge le noyau et recevrait une réponse vide. Sans le second, l'encart apparaîtrait puis disparaîtrait. Le client y retrouve ses sauvegardes conservées, leur date de suppression automatique, un lien de téléchargement et un bouton de suppression immédiate protégé par une confirmation.
 
 Le téléchargement passe par le panel, qui renvoie une URL signée valable pour le seul fichier demandé : le client télécharge directement depuis le nœud, et la clé API ne quitte jamais ClientXCMS.
 
@@ -402,7 +404,9 @@ That notice goes through a view composer, because the core blanks the module pan
 
 Between termination and expiry the server keeps running, and the customer paid for that period. The core blanks the panel as soon as the status is no longer active: left alone, the customer loses the connection address, the panel button and single sign-on while their server is up.
 
-So the module restores the full panel for as long as the server exists on the panel, and switches to the backup notice once it has been deleted. The customer finds their kept backups, their automatic deletion date, a download link and an immediate deletion button behind a confirmation.
+So the module restores the full panel for as long as the server exists on the panel, and switches to the backup notice once it has been deleted.
+
+Two paths lead to that rendering and both are covered: the initial page load, through a view composer, and the live refresh running every few seconds, which re-asks the core and would get an empty answer. Without the second one, the notice would show up then vanish. The customer finds their kept backups, their automatic deletion date, a download link and an immediate deletion button behind a confirmation.
 
 Downloading goes through the panel, which returns a signed URL for that one file: the customer downloads straight from the node, and the API key never leaves ClientXCMS.
 

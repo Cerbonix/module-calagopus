@@ -10,6 +10,7 @@ namespace App\Modules\Calagopus;
 
 use App\Modules\Calagopus\Commands\ConfigureSso;
 use App\Modules\Calagopus\Commands\PurgeExpiredBackups;
+use App\Modules\Calagopus\Middleware\KeepInactivePanel;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Console\Scheduling\Schedule;
 use RateLimiter;
@@ -37,6 +38,7 @@ class CalagopusServiceProvider extends \App\Extensions\BaseModuleServiceProvider
 
         // The core blanks the panel as soon as a service leaves the active state, so kept backups would have no way back.
         \View::composer('front/provisioning/services/show', InactiveServicePanel::class);
+        $this->app->make(\Illuminate\Contracts\Http\Kernel::class)->pushMiddleware(KeepInactivePanel::class);
 
         if ($this->app->runningInConsole()) {
             $this->commands([PurgeExpiredBackups::class, ConfigureSso::class]);
