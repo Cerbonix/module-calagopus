@@ -28,6 +28,7 @@ return [
         'upgraded' => 'Ressources du serveur mises à jour sur le panel. Le nœud les applique de son côté, ce que le panel ne confirme pas immédiatement.',
         'options_applied' => 'Options appliquées au serveur. Le nœud les applique de son côté, ce que le panel ne confirme pas immédiatement.',
         'terminated' => 'Serveur supprimé du panel. Les sauvegardes du client ont été conservées.',
+        'terminated_with_retention' => 'Serveur supprimé du panel. :count sauvegarde(s) conservée(s), purge prévue dans :days jour(s).',
         'already_gone' => 'Aucun serveur correspondant sur le panel, il a probablement déjà été supprimé.',
         'not_found' => 'Aucun serveur correspondant à ce service sur le panel. Il a peut-être été supprimé à la main.',
         'wrong_type' => 'Ce service n\'est pas un service Calagopus.',

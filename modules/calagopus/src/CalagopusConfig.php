@@ -56,6 +56,7 @@ class CalagopusConfig extends AbstractConfig
             'allocations' => 'required|numeric|min:0',
             'databases' => 'required|numeric|min:0',
             'backups' => 'required|numeric|min:0',
+            'backup_retention_days' => 'required|numeric|min:0|max:3650',
             'schedules' => 'required|numeric|min:0',
             'image' => 'required|string|between:2,255',
             'startup' => 'required|string|between:1,8192',

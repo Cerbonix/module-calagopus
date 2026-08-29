@@ -8,6 +8,9 @@
 
 namespace App\Modules\Calagopus;
 
+use App\Modules\Calagopus\Commands\PurgeExpiredBackups;
+use Illuminate\Console\Scheduling\Schedule;
+
 class CalagopusServiceProvider extends \App\Extensions\BaseModuleServiceProvider
 {
     protected string $name = 'Calagopus';
@@ -22,6 +25,17 @@ class CalagopusServiceProvider extends \App\Extensions\BaseModuleServiceProvider
         $this->loadTranslations();
         $this->loadMigrations();
         $this->registerProductTypes();
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([PurgeExpiredBackups::class]);
+        }
+
+        $this->registerSchedule();
+    }
+
+    public function schedule(Schedule $schedule): void
+    {
+        $schedule->command(PurgeExpiredBackups::class)->dailyAt('04:15')->withoutOverlapping();
     }
 
     protected function productsTypes(): array

@@ -30,6 +30,8 @@ return [
         'databases' => 'Databases',
         'backups' => 'Backups',
         'schedules' => 'Schedules',
+        'backup_retention_days' => 'Backup retention',
+        'backup_retention_days_help' => 'Days customer backups are kept after termination before being purged automatically. Zero keeps them forever, at your storage expense.',
 
         'image' => 'Docker image',
         'image_help' => 'Keep the value suggested by the egg unless you have a specific reason to change it.',

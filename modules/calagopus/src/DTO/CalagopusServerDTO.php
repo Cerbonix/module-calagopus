@@ -27,6 +27,7 @@ class CalagopusServerDTO
         public readonly ?int $port = null,
         public readonly ?string $ipAlias = null,
         public readonly array $limits = [],
+        public readonly ?string $nodeUuid = null,
     ) {}
 
     /**
@@ -47,6 +48,7 @@ class CalagopusServerDTO
             port: isset($allocation['port']) ? (int) $allocation['port'] : null,
             ipAlias: $allocation['ip_alias'] ?? null,
             limits: is_array($server['limits'] ?? null) ? $server['limits'] : [],
+            nodeUuid: $server['node']['uuid'] ?? null,
         );
     }
 

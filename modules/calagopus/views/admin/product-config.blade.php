@@ -51,6 +51,9 @@
     <div>
         @include('admin/shared/input', ['name' => 'schedules', 'label' => __('calagopus::admin.config.schedules'), 'value' => $config->schedules, 'type' => 'number', 'min' => 0])
     </div>
+    <div>
+        @include('admin/shared/input', ['name' => 'backup_retention_days', 'label' => __('calagopus::admin.config.backup_retention_days'), 'value' => $config->backup_retention_days, 'help' => __('calagopus::admin.config.backup_retention_days_help'), 'type' => 'number', 'min' => 0])
+    </div>
 
     <div class="md:col-span-2">
         @include('admin/shared/input', ['name' => 'image', 'label' => __('calagopus::admin.config.image'), 'value' => $config->image, 'help' => __('calagopus::admin.config.image_help')])

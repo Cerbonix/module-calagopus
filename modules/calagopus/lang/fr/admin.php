@@ -30,6 +30,8 @@ return [
         'databases' => 'Bases de données',
         'backups' => 'Sauvegardes',
         'schedules' => 'Tâches planifiées',
+        'backup_retention_days' => 'Conservation des sauvegardes',
+        'backup_retention_days_help' => 'Nombre de jours pendant lesquels les sauvegardes du client sont conservées après la résiliation, avant purge automatique. Zéro les conserve indéfiniment, à vos frais de stockage.',
 
         'image' => 'Image Docker',
         'image_help' => 'Laissez la valeur proposée par l\'egg si vous n\'avez pas de raison précise d\'en changer.',

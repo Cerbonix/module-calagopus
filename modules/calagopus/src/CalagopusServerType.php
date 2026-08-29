@@ -18,6 +18,7 @@ use App\Models\Provisioning\Service;
 use App\Models\Store\Product;
 use App\Modules\Calagopus\DTO\CalagopusServerDTO;
 use App\Modules\Calagopus\DTO\CalagopusUserDTO;
+use App\Modules\Calagopus\Models\CalagopusBackupPurge;
 use App\Modules\Calagopus\Models\CalagopusConfig as ConfigModel;
 use GuzzleHttp\Psr7\Response as PsrResponse;
 
@@ -153,18 +154,25 @@ class CalagopusServerType extends AbstractServerType
 
     public function expireAccount(Service $service): ServiceStateChangeDTO
     {
-        return $this->perform($service, function (Server $panel) use ($service) {
+        return $this->perform($service, function (Server $panel, ConfigModel $config) use ($service) {
             $server = CalagopusServerDTO::findByService($panel, $service);
 
             if ($server === null) {
                 return $this->lifecycle($service, true, 'already_gone');
             }
 
-            // delete_backups stays false: customer backups are never destroyed by an expiry without an explicit product decision.
+            $retention = (int) $config->backup_retention_days;
+            $scheduled = CalagopusBackupPurge::recordFor($panel, $server, $service, $retention);
+
+            // delete_backups stays false: the panel would destroy them now, whereas the product decides how long they are kept.
             $response = Http::callApi($panel, 'servers/'.$server->uuid, ['force' => false, 'delete_backups' => false], 'DELETE');
 
             if (! $response->successful()) {
                 return $this->lifecycle($service, false, 'panel_error', ['detail' => $response->errorMessage()]);
+            }
+
+            if ($scheduled > 0) {
+                return $this->lifecycle($service, true, 'terminated_with_retention', ['count' => $scheduled, 'days' => $retention]);
             }
 
             return $this->lifecycle($service, true, 'terminated');
@@ -304,7 +312,11 @@ class CalagopusServerType extends AbstractServerType
 
     private function lifecycle(Service $service, bool $success, string $key, array $data = []): ServiceStateChangeDTO
     {
-        $message = __('calagopus::messages.lifecycle.'.$key, ['detail' => $data['detail'] ?? '']);
+        $message = __('calagopus::messages.lifecycle.'.$key, [
+            'detail' => $data['detail'] ?? '',
+            'count' => $data['count'] ?? 0,
+            'days' => $data['days'] ?? 0,
+        ]);
 
         return new ServiceStateChangeDTO($service, $success, $message, $data);
     }
