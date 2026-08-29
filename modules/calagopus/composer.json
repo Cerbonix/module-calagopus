@@ -1,0 +1,10 @@
+{
+    "name": "cerbonix/calagopus",
+    "type": "clientxcms-plugin",
+    "description": "Game server provisioning module for the Calagopus panel.",
+    "autoload": {
+        "psr-4": {
+            "App\\Modules\\Calagopus\\": "src/"
+        }
+    }
+}

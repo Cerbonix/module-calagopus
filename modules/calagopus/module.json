@@ -1,0 +1,13 @@
+{
+    "name": "Calagopus",
+    "description": "Game server provisioning module for the Calagopus panel.",
+    "uuid": "calagopus",
+    "version": "0.1.0",
+    "author": {
+        "name": "Cerbonix",
+        "email": "contact@cerbonix.net"
+    },
+    "providers": [
+        "App\\Modules\\Calagopus\\CalagopusServiceProvider"
+    ]
+}
