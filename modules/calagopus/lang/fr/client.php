@@ -52,6 +52,14 @@ return [
         'partly_failed' => 'Une sauvegarde n\'a pas pu être supprimée. Réessayez plus tard ou contactez le support.|:count sauvegardes n\'ont pas pu être supprimées. Réessayez plus tard ou contactez le support.',
     ],
 
+    'terminated' => [
+        'heading' => 'Vos sauvegardes après résiliation',
+        'kept' => 'Une sauvegarde de ce service est conservée.|:count sauvegardes de ce service sont conservées.',
+        'until' => 'Elles seront supprimées automatiquement le :date.',
+        'no_limit' => 'Aucune suppression automatique n\'est programmée.',
+        'open' => 'Voir et télécharger mes sauvegardes',
+    ],
+
     'retention' => [
         'notice' => 'Si vous résiliez ce service, vos sauvegardes seront conservées :days jours avant suppression automatique.',
         'notice_unlimited' => 'Si vous résiliez ce service, vos sauvegardes seront conservées sans limite de durée.',

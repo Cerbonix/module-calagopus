@@ -52,6 +52,14 @@ return [
         'partly_failed' => 'One backup could not be deleted. Try again later or contact support.|:count backups could not be deleted. Try again later or contact support.',
     ],
 
+    'terminated' => [
+        'heading' => 'Your backups after termination',
+        'kept' => 'One backup of this service is being kept.|:count backups of this service are being kept.',
+        'until' => 'They will be deleted automatically on :date.',
+        'no_limit' => 'No automatic deletion is scheduled.',
+        'open' => 'View and download my backups',
+    ],
+
     'retention' => [
         'notice' => 'If you terminate this service, your backups will be kept for :days days before automatic deletion.',
         'notice_unlimited' => 'If you terminate this service, your backups will be kept with no time limit.',

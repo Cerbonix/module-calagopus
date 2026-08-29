@@ -142,7 +142,9 @@ Conserver `0` vous expose au titre du principe de limitation de la conservation 
 
 Tant que son service est actif, la fiche de service annonce la durée de conservation applicable en cas de résiliation, et renvoie vers `/calagopus/backups`.
 
-Cette page reste accessible après la résiliation, ce qui est le point important : le noyau cesse d'afficher le panel du module dès que le service n'est plus actif (`ProvisioningTabDTO::renderPanel`), donc l'information ne pouvait pas y vivre. Le client y retrouve ses sauvegardes conservées, leur date de suppression automatique, un lien de téléchargement et un bouton de suppression immédiate protégé par une confirmation.
+Cette page reste accessible après la résiliation, et le client y est conduit depuis la fiche de son service résilié : un encart y annonce combien de sauvegardes sont conservées, jusqu'à quelle date, et y renvoie.
+
+Cet encart passe par un composeur de vue, parce que le noyau vide le panel du module dès que le service quitte l'état actif (`ProvisioningTabDTO::renderPanel`). La page du service, elle, reste consultable quel que soit le statut, donc l'encart y trouve sa place. Le client y retrouve ses sauvegardes conservées, leur date de suppression automatique, un lien de téléchargement et un bouton de suppression immédiate protégé par une confirmation.
 
 Le téléchargement passe par le panel, qui renvoie une URL signée valable pour le seul fichier demandé : le client télécharge directement depuis le nœud, et la clé API ne quitte jamais ClientXCMS.
 
@@ -386,7 +388,9 @@ Keeping `0` exposes you under the storage limitation principle: personal data of
 
 While the service is active, the service page states the retention that would apply on termination, and links to `/calagopus/backups`.
 
-That page stays reachable after termination, which is the point: the core stops rendering the module panel as soon as the service is no longer active (`ProvisioningTabDTO::renderPanel`), so the information could not live there. The customer finds their kept backups, their automatic deletion date, a download link and an immediate deletion button behind a confirmation.
+That page stays reachable after termination, and the customer is led to it from their terminated service page: a notice there states how many backups are kept, until when, and links to it.
+
+That notice goes through a view composer, because the core blanks the module panel as soon as the service leaves the active state (`ProvisioningTabDTO::renderPanel`). The service page itself stays viewable whatever the status, so the notice fits there. The customer finds their kept backups, their automatic deletion date, a download link and an immediate deletion button behind a confirmation.
 
 Downloading goes through the panel, which returns a signed URL for that one file: the customer downloads straight from the node, and the API key never leaves ClientXCMS.
 
