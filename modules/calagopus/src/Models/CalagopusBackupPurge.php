@@ -40,6 +40,11 @@ class CalagopusBackupPurge extends Model
         return $this->belongsTo(Server::class);
     }
 
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
+    }
+
     public function scopeDue($query)
     {
         return $query->where('purge_at', '<=', now());

@@ -62,7 +62,7 @@ class CalagopusConfig extends Model
         'allocations' => 1,
         'databases' => 0,
         'backups' => 0,
-        'backup_retention_days' => 0,
+        'backup_retention_days' => 30,
         'schedules' => 0,
         'start_on_completion' => true,
         'skip_installer' => false,

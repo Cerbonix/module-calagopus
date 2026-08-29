@@ -12,14 +12,12 @@ use App\Abstracts\AbstractPanelProvisioning;
 use App\Models\Provisioning\Server;
 use App\Models\Provisioning\Service;
 use App\Modules\Calagopus\DTO\CalagopusServerDTO;
+use App\Modules\Calagopus\Models\CalagopusConfig as ConfigModel;
 
 class CalagopusPanel extends AbstractPanelProvisioning
 {
     protected string $uuid = 'calagopus';
 
-    /**
-     * Ownership is already enforced by the core before this runs (Front\Provisioning\ServiceController::show).
-     */
     /**
      * Shown to staff, so it carries what support actually needs to act: identifiers, node, and the raw state.
      */
@@ -63,6 +61,7 @@ class CalagopusPanel extends AbstractPanelProvisioning
             'server' => $server,
             'panelUrl' => Http::publicUrl($panel).'/server/'.$server->uuid,
             'ssoUrl' => route('calagopus.sso', ['service' => $service]),
+            'retentionDays' => (int) (ConfigModel::where('product_id', $service->product_id)->value('backup_retention_days') ?? 0),
         ]);
     }
 }

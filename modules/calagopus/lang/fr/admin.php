@@ -59,7 +59,7 @@ return [
         'backups' => 'Sauvegardes',
         'schedules' => 'Tâches planifiées',
         'backup_retention_days' => 'Conservation des sauvegardes',
-        'backup_retention_days_help' => 'Nombre de jours pendant lesquels les sauvegardes du client sont conservées après la résiliation, avant purge automatique. Zéro les conserve indéfiniment, à vos frais de stockage.',
+        'backup_retention_days_help' => 'Nombre de jours pendant lesquels les sauvegardes du client sont conservées après la résiliation, avant purge automatique. Le client en est informé et peut demander leur suppression immédiate. Zéro les conserve indéfiniment, ce qui vous expose au titre de la limitation de conservation du RGPD.',
 
         'image' => 'Image Docker',
         'image_help' => 'Laissez la valeur proposée par l\'egg si vous n\'avez pas de raison précise d\'en changer.',

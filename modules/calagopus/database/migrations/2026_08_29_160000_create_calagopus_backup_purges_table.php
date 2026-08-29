@@ -15,7 +15,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('calagopus_configs', function (Blueprint $table) {
-            $table->unsignedInteger('backup_retention_days')->default(0)->after('backups');
+            $table->unsignedInteger('backup_retention_days')->default(30)->after('backups');
         });
 
         // A backup outlives its server but loses every link to it, so the pairing is recorded while the server still exists.

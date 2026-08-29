@@ -134,7 +134,19 @@ Il n'est appliqué que si le nœud dispose d'un ordonnanceur compatible, `bfq` o
 
 ## Conservation des sauvegardes
 
-La résiliation ne détruit jamais les sauvegardes du client. Chaque produit déclare une durée de conservation en jours, `0` conservant sans limite.
+La résiliation ne détruit jamais les sauvegardes du client. Chaque produit déclare une durée de conservation en jours, **30 par défaut**, `0` conservant sans limite.
+
+Conserver `0` vous expose au titre du principe de limitation de la conservation : des données personnelles d'anciens clients s'accumulent alors sans terme. Ne le choisissez qu'en connaissance de cause.
+
+### Ce que voit le client
+
+Tant que son service est actif, la fiche de service annonce la durée de conservation applicable en cas de résiliation, et renvoie vers `/calagopus/backups`.
+
+Cette page reste accessible après la résiliation, ce qui est le point important : le noyau cesse d'afficher le panel du module dès que le service n'est plus actif (`ProvisioningTabDTO::renderPanel`), donc l'information ne pouvait pas y vivre. Le client y retrouve ses sauvegardes conservées, leur date de suppression automatique, et un bouton de suppression immédiate protégé par une confirmation.
+
+Chaque requête de cette page est bornée au client connecté par une jointure sur le service : personne ne peut lister ni supprimer les sauvegardes d'un autre.
+
+Le texte affiché distingue explicitement les sauvegardes applicatives, seules concernées, des sauvegardes système de votre infrastructure, qui suivent leur propre cycle de vie. Adaptez-le à votre politique de confidentialité si la vôtre diffère.
 
 Les sauvegardes sont relevées **au moment de la résiliation**, tant que le serveur existe encore : une fois celui-ci supprimé, plus rien ne les rattache à quoi que ce soit.
 
@@ -362,7 +374,19 @@ It only applies when the node runs a compatible scheduler, `bfq` or `iocost`. Ot
 
 ## Backup retention
 
-Termination never destroys customer backups. Each product declares a retention in days, `0` keeping them forever.
+Termination never destroys customer backups. Each product declares a retention in days, **30 by default**, `0` keeping them forever.
+
+Keeping `0` exposes you under the storage limitation principle: personal data of former customers then piles up with no end date. Only pick it knowingly.
+
+### What the customer sees
+
+While the service is active, the service page states the retention that would apply on termination, and links to `/calagopus/backups`.
+
+That page stays reachable after termination, which is the point: the core stops rendering the module panel as soon as the service is no longer active (`ProvisioningTabDTO::renderPanel`), so the information could not live there. The customer finds their kept backups, their automatic deletion date, and an immediate deletion button behind a confirmation.
+
+Every query on that page is scoped to the signed-in customer through a join on the service: nobody can list or delete someone else's backups.
+
+The wording tells application backups, the only ones concerned, apart from the system backups of your infrastructure, which follow their own lifecycle. Adjust it to your privacy policy if yours differs.
 
 Backups are recorded **at termination time**, while the server still exists: once it is gone, nothing ties them to anything.
 

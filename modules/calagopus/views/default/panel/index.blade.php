@@ -47,3 +47,10 @@
         </a>
     </div>
 </div>
+
+<p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+    {{ $retentionDays > 0
+        ? __('calagopus::client.retention.notice', ['days' => $retentionDays])
+        : __('calagopus::client.retention.notice_unlimited') }}
+    <a href="{{ route('calagopus.backups.index') }}" class="font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">{{ __('calagopus::client.retention.manage') }}</a>
+</p>

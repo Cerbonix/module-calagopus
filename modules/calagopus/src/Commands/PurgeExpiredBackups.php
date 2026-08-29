@@ -8,7 +8,7 @@
 
 namespace App\Modules\Calagopus\Commands;
 
-use App\Modules\Calagopus\Http;
+use App\Modules\Calagopus\BackupPurger;
 use App\Modules\Calagopus\Models\CalagopusBackupPurge;
 use Illuminate\Console\Command;
 
@@ -18,7 +18,7 @@ class PurgeExpiredBackups extends Command
 
     protected $description = 'Delete Calagopus backups of terminated services whose retention has elapsed.';
 
-    public function handle(): int
+    public function handle(BackupPurger $purger): int
     {
         $due = CalagopusBackupPurge::due()
             ->with('server')
@@ -43,9 +43,15 @@ class PurgeExpiredBackups extends Command
                 continue;
             }
 
-            match ($this->purge($entry)) {
-                'deleted' => $deleted++,
-                'orphaned' => $orphaned++,
+            $outcome = $purger->purge($entry);
+
+            if ($outcome === BackupPurger::FAILED) {
+                $this->warn(sprintf('backup %s kept, will be retried', $entry->backup_uuid));
+            }
+
+            match ($outcome) {
+                BackupPurger::DELETED => $deleted++,
+                BackupPurger::ORPHANED => $orphaned++,
                 default => $failed++,
             };
         }
@@ -53,31 +59,5 @@ class PurgeExpiredBackups extends Command
         $this->info(sprintf('%d deleted, %d already gone, %d left for the next run.', $deleted, $orphaned, $failed));
 
         return self::SUCCESS;
-    }
-
-    /**
-     * A backup the panel no longer knows is a success for us: the goal is that it stops existing.
-     */
-    private function purge(CalagopusBackupPurge $entry): string
-    {
-        $panel = $entry->server;
-
-        if ($panel === null) {
-            $entry->delete();
-
-            return 'orphaned';
-        }
-
-        $response = Http::callApi($panel, "nodes/{$entry->node_uuid}/backups/{$entry->backup_uuid}", [], 'DELETE');
-
-        if ($response->successful() || $response->status() === 404) {
-            $entry->delete();
-
-            return $response->successful() ? 'deleted' : 'orphaned';
-        }
-
-        $this->warn(sprintf('backup %s kept: %s', $entry->backup_uuid, $response->errorMessage()));
-
-        return 'failed';
     }
 }
