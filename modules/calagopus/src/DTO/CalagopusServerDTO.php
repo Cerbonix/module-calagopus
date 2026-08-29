@@ -18,11 +18,9 @@ class CalagopusServerDTO
 {
     public function __construct(
         public readonly string $uuid,
-        public readonly string $uuidShort,
         public readonly string $name,
         public readonly bool $isSuspended,
         public readonly ?string $externalId = null,
-        public readonly ?string $status = null,
         public readonly ?string $ip = null,
         public readonly ?int $port = null,
         public readonly ?string $ipAlias = null,
@@ -39,11 +37,9 @@ class CalagopusServerDTO
 
         return new self(
             uuid: (string) $server['uuid'],
-            uuidShort: (string) ($server['uuid_short'] ?? ''),
             name: (string) ($server['name'] ?? ''),
             isSuspended: (bool) ($server['is_suspended'] ?? false),
             externalId: isset($server['external_id']) ? (string) $server['external_id'] : null,
-            status: isset($server['status']) ? (string) $server['status'] : null,
             ip: $allocation['ip'] ?? null,
             port: isset($allocation['port']) ? (int) $allocation['port'] : null,
             ipAlias: $allocation['ip_alias'] ?? null,

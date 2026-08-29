@@ -22,7 +22,6 @@ class CalagopusUserDTO
         public readonly string $uuid,
         public readonly string $email,
         public readonly string $username,
-        public readonly ?string $externalId = null,
         public readonly ?string $password = null,
         public readonly bool $wasCreated = false,
     ) {}
@@ -33,7 +32,6 @@ class CalagopusUserDTO
             uuid: (string) $user['uuid'],
             email: (string) $user['email'],
             username: (string) $user['username'],
-            externalId: isset($user['external_id']) ? (string) $user['external_id'] : null,
             password: $password,
             wasCreated: $wasCreated,
         );
